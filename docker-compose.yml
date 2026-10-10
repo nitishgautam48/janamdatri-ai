@@ -1,0 +1,99 @@
+# Janamdatri-AI · full stack (web app + API + workers + database + AI models)
+#
+#   cp .env.example .env          # set JWT_SECRET, ADMIN_PASSWORD, SMS keys
+#   docker compose up -d --build  # first start downloads the language models, Whisper, OCR and voice models once
+#   open http://localhost:8000      (SMS inbox with OTPs: http://localhost:8025)
+#
+# One image for api, worker, beat and models: it is built once (by the api service) and shared, instead of
+# four heavy builds running at the same time (which can crash Docker Desktop's builder with "EOF").
+x-app: &app
+  image: janamdatri-ai-app:latest
+  pull_policy: never
+  env_file: .env
+  environment: &app-env
+    DATABASE_URL: postgresql+psycopg://janamdatri:janamdatri@db:5432/janamdatri
+    REDIS_URL: redis://redis:6379/0
+    CELERY_ENABLED: "true"
+    CELERY_BROKER_URL: redis://redis:6379/1
+    CELERY_RESULT_BACKEND: redis://redis:6379/2
+    LLM_BASE_URL: http://ollama:11434
+    SMTP_HOST: mailpit
+    SMTP_PORT: "1025"
+    COQUI_TOS_AGREED: "${COQUI_TOS_AGREED:-1}"  # XTTS v2 voice: Coqui Public Model License (non-commercial)
+  volumes:
+    - media:/app/media
+    - speech-models:/home/app/.cache
+    - ocr-models:/home/app/.paddleocr
+    - voice-models:/home/app/.local/share/tts
+  restart: unless-stopped
+
+services:
+  api:
+    <<: *app
+    build: {context: ., dockerfile: backend/Dockerfile}
+    pull_policy: build
+    ports: ["8000:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      mailpit: {condition: service_started}
+      models: {condition: service_completed_successfully}
+
+  worker:
+    <<: *app
+    command: celery -A app.workers.celery_app worker -l info --concurrency 2
+    depends_on: [api]
+
+  beat:
+    <<: *app
+    command: celery -A app.workers.celery_app beat -l info --schedule /tmp/celerybeat-schedule
+    depends_on: [api]
+
+  # One-off: download Whisper, PaddleOCR and Coqui voice models into volumes so the app runs offline afterwards.
+  models:
+    <<: *app
+    command: python -m scripts.download_models
+    restart: "no"
+
+  db:
+    image: postgres:16-alpine
+    environment: {POSTGRES_USER: janamdatri, POSTGRES_PASSWORD: janamdatri, POSTGRES_DB: janamdatri}
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: {test: ["CMD-SHELL", "pg_isready -U janamdatri"], interval: 5s, retries: 10}
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes: [redisdata:/data]
+    healthcheck: {test: ["CMD", "redis-cli", "ping"], interval: 5s, retries: 10}
+    restart: unless-stopped
+
+  # Local inbox for every SMS (OTPs, alerts): http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ["8025:8025"]
+    restart: unless-stopped
+
+  # Local language + embedding models served by Ollama (for an NVIDIA GPU see docker-compose.gpu.yml).
+  ollama:
+    image: ollama/ollama:latest
+    volumes: [ollama:/root/.ollama]
+    restart: unless-stopped
+
+  # One-off: pull the models named in .env: main model, second model and the embedding model.
+  ollama-pull:
+    image: ollama/ollama:latest
+    entrypoint: ["sh", "-c", "sleep 3 && for m in ${LLM_MODEL:-gemma3:12b} ${LLM_SECONDARY_MODEL-gemma2:9b} ${EMBEDDING_OLLAMA_MODEL:-nomic-embed-text}; do echo \"pulling $$m\"; ollama pull $$m || echo \"could not pull $$m\"; done"]
+    environment: {OLLAMA_HOST: "ollama:11434"}
+    depends_on: [ollama]
+    restart: "no"
+
+volumes:
+  pgdata:
+  redisdata:
+  media:
+  ollama:
+  speech-models:
+  ocr-models:
+  voice-models:

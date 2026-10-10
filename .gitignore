@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local settings and secrets (copy .env.example to .env)
+.env
+
+# Local data, uploads and generated models
+*.db
+*.sqlite3
+dump.rdb
+media/
+backend/media/
+backend/models/*.joblib
+backend/models/*.npy
+
+# Tools downloaded by run_local (Mailpit)
+.tools/
+backend/.tools/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,23 @@
+line-length = 150
+target-version = "py311"
+exclude = ["alembic/versions"]
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["B008", "E731", "UP042", "B905"]
+
+[lint.per-file-ignores]
+# Bilingual clinical content and message templates: long literal strings by design.
+"app/knowledge/*.py" = ["E501"]
+"app/emotional/service.py" = ["E501"]
+"app/assessment/engine.py" = ["E501"]
+"app/companion/service.py" = ["E501"]
+"app/ai/safety.py" = ["E501"]
+"app/ai/sentiment.py" = ["E501"]
+"app/reports/service.py" = ["E501"]
+"app/ocr/extractor.py" = ["E501"]
+"app/database/seed.py" = ["E501"]
+"app/ai/prompts.py" = ["E501"]
+"app/core/pregnancy.py" = ["E501"]
+"app/emergency/service.py" = ["E501"]
+"tests/*.py" = ["E501"]

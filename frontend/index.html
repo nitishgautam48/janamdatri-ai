@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Janamdatri-AI · जन्मदात्री</title>
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0B1020">
+<script>window.__resources = {"https://unpkg.com/react@18.3.1/umd/react.production.min.js": "./vendor/react.production.min.js","https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js": "./vendor/react-dom.production.min.js"};</script>
+<script src="./janamdatri-i18n.js"></script>
+<script src="./janamdatri-ui.js" data-lang-pill></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./vendor/lucide/lucide.css">
+<script src="./image-slot.js"></script>
+<style>body{margin:0;background:#0B1020;color:#F8FAFC;font-family:'Mukta',system-ui,sans-serif;-webkit-font-smoothing:antialiased}a{color:#5EEAD4;text-decoration:none}a:hover{color:#99F6E4}details>summary{list-style:none}details>summary::-webkit-details-marker{display:none}details[open] .chev{transform:rotate(45deg)}*{box-sizing:border-box}</style>
+</helmet>
+<div style="min-height:100vh;background:#0B1020">
+
+<nav style="position:sticky;top:0;z-index:20;background:rgba(11,16,32,.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(148,163,184,.12)">
+  <div style="max-width:1240px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:12px 24px;flex-wrap:wrap">
+    <a href="#" style="display:flex;align-items:center;gap:10px;color:#F8FAFC">
+      <span style="width:36px;height:36px;border-radius:12px;background:#0F766E;display:grid;place-items:center;font:700 18px 'Baloo 2';color:#F8FAFC">ज</span>
+      <span style="display:flex;flex-direction:column;line-height:1"><span style="font:700 20px 'Baloo 2'">Janamdatri-AI</span><span style="font-size:12px;color:#94A3B8">जन्मदात्री</span></span>
+    </a>
+    <div style="order:3;flex:1 1 100%;display:flex;gap:26px;overflow-x:auto;white-space:nowrap;font-size:15px;padding-top:2px">
+      <a href="#" style="color:#F8FAFC">Home</a>
+      <a href="#journey" style="color:#94A3B8">How It Works</a>
+      <a href="#helps" style="color:#94A3B8">Features</a>
+      <a href="#helps" style="color:#94A3B8">Pregnancy Companion</a>
+      <a href="#journey" style="color:#94A3B8">ASHA Support</a>
+      <a href="#ecosystem" style="color:#94A3B8">Impact</a>
+      <a href="/docs" style="color:#94A3B8">Documentation</a>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:10px;align-items:center;white-space:nowrap">
+      <a href="app.dc.html#login" style="padding:10px 16px;border-radius:12px;color:#F8FAFC;font-weight:600;font-size:15px">Login</a>
+      <a href="app.dc.html#signup" style="padding:10px 18px;border-radius:12px;background:#F8FAFC;color:#0B1020;font-weight:700;font-size:15px">Sign Up</a>
+      <a href="app.dc.html#emergency" style="display:flex;align-items:center;gap:8px;white-space:nowrap;padding:10px 16px;border-radius:999px;background:rgba(220,38,38,.14);border:1px solid rgba(220,38,38,.55);color:#FCA5A5;font-weight:700;font-size:15px" style-hover="background:#DC2626;color:#fff">
+        <span style="width:8px;height:8px;border-radius:50%;background:#EF4444;box-shadow:0 0 0 4px rgba(239,68,68,.25)"></span>Emergency Help <span style="font-weight:500;opacity:.8">· आपात मदद</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<header style="max-width:1240px;margin:0 auto;padding:72px 24px 72px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:56px;align-items:center">
+  <div style="display:flex;flex-direction:column;gap:22px">
+    <h1 style="margin:0;font:800 clamp(40px,5.4vw,68px)/1.02 'Baloo 2';letter-spacing:-.02em;text-wrap:balance">AI-Powered Maternal Health Companion</h1>
+    <div style="display:flex;flex-direction:column;gap:4px;padding-left:16px;border-left:3px solid #F472B6">
+      <span style="font:600 22px/1.3 'Baloo 2';color:#F8FAFC">For Every Mother. Every Week. Every Step of the Journey.</span>
+      <span style="font-size:18px;color:#F9A8D4;font-weight:500">हर माँ के साथ। हर सप्ताह। हर कदम पर।</span>
+    </div>
+    <p style="margin:0;font-size:19px;line-height:1.55;color:#94A3B8;max-width:580px;text-wrap:pretty">Supporting mothers throughout pregnancy through personalized guidance, emotional wellbeing support, pregnancy planning, ASHA worker assistance, emergency care navigation and healthcare access.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;padding-top:4px">
+      <a href="app.dc.html#mother-signup" style="padding:16px 24px;border-radius:16px;background:#0F766E;color:#F8FAFC;font-weight:700;font-size:17px;display:flex;flex-direction:column;line-height:1.2" style-hover="background:#0d6b64">Create Health Passport<span style="font-size:13px;font-weight:500;color:#99F6E4">हेल्थ पासपोर्ट बनाएँ</span></a>
+      <a href="app.dc.html#mother-signup" style="padding:16px 24px;border-radius:16px;background:#111827;border:1px solid rgba(148,163,184,.2);color:#F8FAFC;font-weight:700;font-size:17px;display:flex;flex-direction:column;line-height:1.2">Start Pregnancy Journey<span style="font-size:13px;font-weight:500;color:#94A3B8">यात्रा शुरू करें</span></a>
+      <a href="app.dc.html" style="padding:16px 20px;border-radius:16px;color:#F8FAFC;font-weight:600;font-size:17px;display:flex;align-items:center;gap:10px"><span style="width:32px;height:32px;border-radius:50%;border:1.5px solid #F472B6;display:grid;place-items:center;color:#F472B6;font-size:14px"><i class="icon-play"></i></span>Open the App</a>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px 18px;padding-top:6px;font-size:15px;color:#CBD5E1">
+      <span style="display:flex;gap:6px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Hindi Support</span>
+      <span style="display:flex;gap:6px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Voice Support</span>
+      <span style="display:flex;gap:6px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Verified ASHA Assistance</span>
+      <span style="display:flex;gap:6px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Emergency Ready</span>
+      <span style="display:flex;gap:6px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Nearby Healthcare Navigation</span>
+      <span style="display:flex;gap:6px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Secure &amp; Private</span>
+    </div>
+  </div>
+  <div style="position:relative;min-height:580px">
+    <div style="position:absolute;inset:0 60px 60px 0;border-radius:32px;overflow:hidden;border:1px solid rgba(148,163,184,.14);background:#111827"><image-slot id="hero-mother-asha" shape="rect" src="illustrations/hero-mother-asha.svg" placeholder="Hero illustration: mother + ASHA worker, village"></image-slot></div>
+    <div style="position:absolute;left:-12px;top:32px;padding:14px 18px;border-radius:20px;background:#0F766E;box-shadow:0 20px 40px -20px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:6px;width:200px">
+      <span style="font-size:13px;color:#CCFBF1">Second Trimester</span>
+      <span style="font:800 32px/1 'Baloo 2'">Week 24</span>
+      <span style="height:6px;border-radius:99px;background:rgba(255,255,255,.2)"><span style="display:block;width:60%;height:100%;background:#F8FAFC;border-radius:99px"></span></span>
+    </div>
+    <div style="position:absolute;right:0;bottom:0;width:320px;padding:20px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.18);box-shadow:0 30px 60px -20px rgba(0,0,0,.7);display:flex;flex-direction:column;gap:14px">
+      <span style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#5EEAD4">YOUR ASSIGNED HEALTH WORKER</span>
+      <div style="display:flex;gap:12px;align-items:center">
+        <image-slot id="landing-asha-photo" shape="circle" src="illustrations/asha-avatar.svg" style="width:56px;height:56px;flex:none" placeholder="Photo"></image-slot>
+        <span style="display:flex;flex-direction:column;line-height:1.25"><span style="font:700 20px 'Baloo 2'">Sunita Devi</span><span style="font-size:14px;color:#94A3B8">ASHA Worker · Vigyan Nagar Sub Centre</span></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">
+        <span style="display:flex;gap:8px;align-items:center"><i class="icon-shield-check" style="color:#22C55E"></i>Government Verified</span>
+        <span style="display:flex;gap:8px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Messaging Available</span>
+        <span style="display:flex;gap:8px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Emergency Support</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <span style="height:46px;border-radius:14px;background:#0F766E;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700"><i class="icon-message-circle"></i>Message</span>
+        <span style="height:46px;border-radius:14px;border:1px solid rgba(20,184,166,.45);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700"><i class="icon-phone" style="color:#5EEAD4"></i>Secure Call</span>
+      </div>
+      <span style="display:flex;gap:8px;align-items:center;font-size:13px;color:#99F6E4"><i class="icon-lock"></i>Your phone number remains completely private.</span>
+    </div>
+  </div>
+</header>
+
+<section id="helps" style="max-width:1240px;margin:0 auto;padding:72px 24px">
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:36px">
+    <span style="color:#5EEAD4;font-weight:600;font-size:15px">How Janamdatri helps you · जन्मदात्री कैसे मदद करती है</span>
+    <h2 style="margin:0;font:700 clamp(30px,3.6vw,44px)/1.1 'Baloo 2';max-width:760px;text-wrap:balance">Six ways we stay with you through pregnancy</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px">
+    <div style="padding:28px;border-radius:24px;background:#0F766E;display:flex;flex-direction:column;gap:12px;min-height:260px;transition:transform .2s" style-hover="transform:translateY(-3px)"><span style="font:700 14px 'Baloo 2';color:#CCFBF1">01</span><span style="width:56px;height:56px;border-radius:18px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:26px"><i class="icon-id-card"></i></span><span style="margin-top:auto;font:700 26px/1.1 'Baloo 2'">Maternal Health Passport</span><span style="color:#CCFBF1;font-size:16px;line-height:1.5">Store your pregnancy history, reports and health information.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:12px;min-height:260px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="font:700 14px 'Baloo 2';color:#64748B">02</span><span style="width:56px;height:56px;border-radius:18px;background:rgba(244,114,182,.14);color:#F472B6;display:grid;place-items:center;font-size:26px"><i class="icon-heart-pulse"></i></span><span style="margin-top:auto;font:700 26px/1.1 'Baloo 2'">Health Assistant</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">Ask questions about symptoms, reports and maternal health.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:12px;min-height:260px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="font:700 14px 'Baloo 2';color:#64748B">03</span><span style="width:56px;height:56px;border-radius:18px;background:rgba(20,184,166,.14);color:#5EEAD4;display:grid;place-items:center;font-size:26px"><i class="icon-flower-2"></i></span><span style="margin-top:auto;font:700 26px/1.1 'Baloo 2'">Pregnancy Companion</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">Receive daily plans, wellness goals and pregnancy guidance.</span></div>
+    <div style="padding:28px;border-radius:24px;background:rgba(232,121,249,.10);border:1px solid rgba(232,121,249,.3);display:flex;flex-direction:column;gap:12px;min-height:260px;transition:transform .2s" style-hover="transform:translateY(-3px)"><span style="font:700 14px 'Baloo 2';color:#D8B4E2">04</span><span style="width:56px;height:56px;border-radius:18px;background:rgba(232,121,249,.16);color:#E879F9;display:grid;place-items:center;font-size:26px"><i class="icon-hand-heart"></i></span><span style="margin-top:auto;font:700 26px/1.1 'Baloo 2'">Talk To Me</span><span style="color:#F5D0FE;font-size:16px;line-height:1.5">A friendly space for emotional wellbeing support.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:12px;min-height:260px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="font:700 14px 'Baloo 2';color:#64748B">05</span><span style="width:56px;height:56px;border-radius:18px;background:rgba(34,197,94,.14);color:#4ADE80;display:grid;place-items:center;font-size:26px"><i class="icon-stethoscope"></i></span><span style="margin-top:auto;font:700 26px/1.1 'Baloo 2'">ASHA Support</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">Connect with your assigned ASHA worker.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:12px;min-height:260px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="font:700 14px 'Baloo 2';color:#64748B">06</span><span style="width:56px;height:56px;border-radius:18px;background:rgba(234,179,8,.14);color:#FACC15;display:grid;place-items:center;font-size:26px"><i class="icon-map-pin"></i></span><span style="margin-top:auto;font:700 26px/1.1 'Baloo 2'">Nearby Care</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">Find PHCs, CHCs and hospitals nearby.</span></div>
+  </div>
+</section>
+
+<section id="demo" style="background:#0D1326;border-top:1px solid rgba(148,163,184,.1);border-bottom:1px solid rgba(148,163,184,.1)">
+  <div style="max-width:1240px;margin:0 auto;padding:96px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:56px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="color:#5EEAD4;font-weight:600;font-size:15px">How it works · देखिए कैसे काम करता है</span>
+      <h2 style="margin:0;font:700 clamp(30px,3.6vw,44px)/1.1 'Baloo 2';text-wrap:balance">See Janamdatri In Action</h2>
+      <p style="margin:0;color:#94A3B8;font-size:18px;line-height:1.55;max-width:480px">Janamdatri reads her health passport and reports, then points her to the right next step: a wellness plan, her ASHA worker, or a nearby facility.</p>
+      <div style="height:240px;border-radius:24px;overflow:hidden;border:1px solid rgba(148,163,184,.14);background:#111827"><image-slot id="health-assistant" shape="rect" src="illustrations/health-assistant.svg" placeholder="Health Assistant illustration"></image-slot></div>
+    </div>
+    <div style="border-radius:32px;background:#111827;border:1px solid rgba(148,163,184,.14);padding:24px;display:flex;flex-direction:column;gap:14px;box-shadow:0 40px 80px -40px rgba(0,0,0,.7)">
+      <div style="display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(148,163,184,.12)"><span style="width:44px;height:44px;border-radius:14px;background:#0F766E;display:grid;place-items:center;font-size:22px"><i class="icon-heart-pulse"></i></span><span style="line-height:1.2"><b style="font-size:17px">Health Assistant</b><br><span style="font-size:13px;color:#94A3B8">स्वास्थ्य सहायक · Hindi + English</span></span></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end"><span style="font-size:12px;color:#64748B">Mother</span><span style="max-width:80%;padding:14px 16px;border-radius:20px 20px 6px 20px;background:#0F766E;font-size:17px">I feel tired and dizzy.<br><span style="font-size:14px;color:#CCFBF1">मुझे थकान और चक्कर आ रहे हैं।</span></span></div>
+      <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start"><span style="font-size:12px;color:#64748B">Janamdatri</span><div style="max-width:90%;padding:16px;border-radius:20px 20px 20px 6px;background:#0B1020;font-size:16px;line-height:1.5;display:flex;flex-direction:column;gap:12px"><span>I can see your recent report showed <b style="color:#FACC15">moderate anemia</b>.</span><span style="color:#94A3B8">Would you like to:</span>
+        <span style="display:flex;flex-direction:column;gap:8px">
+          <span style="padding:12px 14px;border-radius:14px;background:#111827;border:1px solid rgba(20,184,166,.35);display:flex;gap:10px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>View Today's Wellness Plan</span>
+          <span style="padding:12px 14px;border-radius:14px;background:#111827;border:1px solid rgba(20,184,166,.35);display:flex;gap:10px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>Talk To Your ASHA Worker</span>
+          <span style="padding:12px 14px;border-radius:14px;background:#111827;border:1px solid rgba(20,184,166,.35);display:flex;gap:10px;align-items:center"><i class="icon-check" style="color:#22C55E"></i>View Nearby Facilities</span>
+        </span></div></div>
+      <div style="display:flex;gap:8px;align-items:center;padding-top:6px"><span style="flex:1;height:48px;border-radius:16px;background:#0B1020;padding:0 16px;display:flex;align-items:center;color:#64748B">Type or speak…</span><span style="width:52px;height:52px;border-radius:50%;background:#14B8A6;color:#0B1020;display:grid;place-items:center;font-size:22px"><i class="icon-mic"></i></span></div>
+    </div>
+  </div>
+</section>
+
+<section style="max-width:1240px;margin:0 auto;padding:96px 24px">
+  <div style="border-radius:36px;background:linear-gradient(160deg,#1E1430,#120E1F);border:1px solid rgba(232,121,249,.22);padding:clamp(24px,4vw,56px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:48px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <span style="color:#F0ABFC;font-weight:600;font-size:15px">Emotional wellbeing · मन की बात</span>
+      <h2 style="margin:0;font:700 clamp(30px,3.6vw,44px)/1.1 'Baloo 2';text-wrap:balance">You Don't Have To Go Through Pregnancy Alone</h2>
+      <p style="margin:0;color:#D8B4E2;font-size:18px;line-height:1.55">Talk to Janamdatri whenever you need support. आप जब चाहें, बात कर सकती हैं।</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span style="padding:10px 14px;border-radius:999px;background:rgba(232,121,249,.12);font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-message-circle-heart" style="color:#E879F9"></i>Friendly Conversations</span>
+        <span style="padding:10px 14px;border-radius:999px;background:rgba(232,121,249,.12);font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-calendar-heart" style="color:#E879F9"></i>Emotional Check-ins</span>
+        <span style="padding:10px 14px;border-radius:999px;background:rgba(232,121,249,.12);font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-heart-handshake" style="color:#E879F9"></i>Non-Judgmental Support</span>
+        <span style="padding:10px 14px;border-radius:999px;background:rgba(232,121,249,.12);font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-mic" style="color:#E879F9"></i>Voice Interaction</span>
+        <span style="padding:10px 14px;border-radius:999px;background:rgba(232,121,249,.12);font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-lock" style="color:#E879F9"></i>Privacy</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding-top:8px">
+        <span style="align-self:flex-start;max-width:85%;padding:14px 18px;border-radius:20px 20px 20px 6px;background:#2A1D3D;font-size:17px">"How has your day been?"<br><span style="font-size:14px;color:#D8B4E2">आज का दिन कैसा रहा?</span></span>
+        <span style="align-self:flex-start;max-width:85%;padding:14px 18px;border-radius:20px 20px 20px 6px;background:#2A1D3D;font-size:17px">"Would you like to tell me more?"<br><span style="font-size:14px;color:#D8B4E2">क्या आप और बताना चाहेंगी?</span></span>
+      </div>
+      <a href="app.dc.html#talk" style="align-self:flex-start;margin-top:6px;padding:16px 24px;border-radius:16px;background:#E879F9;color:#2A0B33;font-weight:700;font-size:17px">Talk To Me · मुझसे बात करें</a>
+    </div>
+    <div style="height:460px;border-radius:28px;overflow:hidden;border:1px solid rgba(232,121,249,.18);background:rgba(18,14,31,.6)"><image-slot id="emotional-companion" shape="rect" src="illustrations/emotional-companion.svg" placeholder="Talk To Me illustration: mother at home, evening"></image-slot></div>
+  </div>
+</section>
+
+<section style="max-width:1240px;margin:0 auto;padding:40px 24px 40px">
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:36px">
+    <span style="color:#5EEAD4;font-weight:600;font-size:15px">Maternal health challenges · मुख्य चुनौतियाँ</span>
+    <h2 style="margin:0;font:700 clamp(30px,3.6vw,44px)/1.1 'Baloo 2';max-width:720px;text-wrap:balance">What we help mothers watch for, every week</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px">
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:10px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="width:12px;height:12px;border-radius:50%;background:#F472B6"></span><span style="font:700 24px 'Baloo 2'">Anemia</span><span style="color:#5EEAD4;font-size:15px">खून की कमी</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">Daily iron reminders, hemoglobin tracking from CBC reports, and iron-rich local meal ideas.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:10px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="width:12px;height:12px;border-radius:50%;background:#F97316"></span><span style="font:700 24px 'Baloo 2'">High Blood Pressure</span><span style="color:#5EEAD4;font-size:15px">उच्च रक्तचाप</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">BP logging, swelling and headache check-ins, and timely referral when readings rise.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:10px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="width:12px;height:12px;border-radius:50%;background:#E879F9"></span><span style="font:700 24px 'Baloo 2'">Mental Wellbeing</span><span style="color:#5EEAD4;font-size:15px">मन की सेहत</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">A friendly space to talk about worry, loneliness and difficult days, any time.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:10px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="width:12px;height:12px;border-radius:50%;background:#DC2626"></span><span style="font:700 24px 'Baloo 2'">Danger Signs</span><span style="color:#5EEAD4;font-size:15px">खतरे के संकेत</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">Plain-language guides so families know when to go to hospital immediately.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:10px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="width:12px;height:12px;border-radius:50%;background:#14B8A6"></span><span style="font:700 24px 'Baloo 2'">Access To Care</span><span style="color:#5EEAD4;font-size:15px">इलाज तक पहुँच</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">Nearest PHC, CHC and district hospital with distance, travel time and phone numbers.</span></div>
+    <div style="padding:28px;border-radius:24px;background:#111827;border:1px solid rgba(148,163,184,.12);display:flex;flex-direction:column;gap:10px;transition:transform .2s,border-color .2s" style-hover="transform:translateY(-3px);border-color:rgba(20,184,166,.5)"><span style="width:12px;height:12px;border-radius:50%;background:#22C55E"></span><span style="font:700 24px 'Baloo 2'">ANC Follow-up</span><span style="color:#5EEAD4;font-size:15px">प्रसव-पूर्व जाँच</span><span style="color:#94A3B8;font-size:16px;line-height:1.5">Visit reminders, what to bring, and ASHA follow-up so no check-up is missed.</span></div>
+  </div>
+</section>
+
+<section id="journey" style="max-width:1240px;margin:0 auto;padding:96px 24px">
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:44px">
+    <span style="color:#5EEAD4;font-weight:600;font-size:15px">ASHA support journey · आशा के साथ सफ़र</span>
+    <h2 style="margin:0;font:700 clamp(30px,3.6vw,44px)/1.1 'Baloo 2';max-width:760px;text-wrap:balance">A real person guides every mother, from first profile to the right hospital</h2>
+  </div>
+  <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px">
+    <div style="position:absolute;left:40px;right:40px;top:36px;height:2px;background:linear-gradient(90deg,#F472B6,#14B8A6 40%,#22C55E)"></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:12px"><span style="width:72px;height:72px;border-radius:50%;background:#1E1430;border:2px solid #F472B6;display:grid;place-items:center;font-size:28px;color:#F472B6"><i class="icon-baby"></i></span><span style="line-height:1.2"><b style="font:700 19px 'Baloo 2'">Mother</b><br><span style="font-size:14px;color:#94A3B8">माँ</span></span></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:12px"><span style="width:72px;height:72px;border-radius:50%;background:#0B1020;border:2px solid #14B8A6;display:grid;place-items:center;font-size:28px;color:#5EEAD4"><i class="icon-id-card"></i></span><span style="line-height:1.2"><b style="font:700 19px 'Baloo 2'">Health Passport</b><br><span style="font-size:14px;color:#94A3B8">हेल्थ पासपोर्ट</span></span></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:12px"><span style="width:72px;height:72px;border-radius:50%;background:#0F766E;border:2px solid #14B8A6;display:grid;place-items:center;font-size:28px"><i class="icon-stethoscope"></i></span><span style="line-height:1.2"><b style="font:700 19px 'Baloo 2'">Assigned ASHA Worker</b><br><span style="font-size:14px;color:#94A3B8">आपकी आशा दीदी</span></span></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:12px"><span style="width:72px;height:72px;border-radius:50%;background:#0B1020;border:2px solid #14B8A6;display:grid;place-items:center;font-size:28px;color:#5EEAD4"><i class="icon-messages-square"></i></span><span style="line-height:1.2"><b style="font:700 19px 'Baloo 2'">Guidance</b><br><span style="font-size:14px;color:#94A3B8">सलाह</span></span></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:12px"><span style="width:72px;height:72px;border-radius:50%;background:#0B1020;border:2px solid #22C55E;display:grid;place-items:center;font-size:28px;color:#4ADE80"><i class="icon-file-output"></i></span><span style="line-height:1.2"><b style="font:700 19px 'Baloo 2'">Referral Support</b><br><span style="font-size:14px;color:#94A3B8">रेफ़रल</span></span></div>
+    <div style="position:relative;display:flex;flex-direction:column;gap:12px"><span style="width:72px;height:72px;border-radius:50%;background:#22C55E;display:grid;place-items:center;font-size:28px;color:#052e16"><i class="icon-hospital"></i></span><span style="line-height:1.2"><b style="font:700 19px 'Baloo 2'">Nearest Facility</b><br><span style="font-size:14px;color:#94A3B8">नज़दीकी अस्पताल</span></span></div>
+  </div>
+</section>
+
+<section style="max-width:1240px;margin:0 auto;padding:40px 24px">
+  <div style="border-radius:32px;background:linear-gradient(180deg,rgba(220,38,38,.10),rgba(220,38,38,.02));border:1px solid rgba(220,38,38,.25);padding:clamp(24px,4vw,48px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:40px">
+    <div style="display:flex;flex-direction:column;gap:16px;align-self:start;position:sticky;top:120px">
+      <span style="color:#FCA5A5;font-weight:600;font-size:15px">Danger signs · खतरे के संकेत</span>
+      <h2 style="margin:0;font:700 clamp(30px,3.4vw,42px)/1.1 'Baloo 2';text-wrap:balance">If you notice any of these, get help now</h2>
+      <p style="margin:0;color:#94A3B8;font-size:17px;line-height:1.55">Tap a sign to learn what to do. You don't need an account to call for help.</p>
+      <div style="height:220px;border-radius:24px;overflow:hidden;border:1px solid rgba(220,38,38,.25);background:#1A0F16;margin-top:8px"><image-slot id="danger-signs" shape="rect" src="illustrations/danger-signs.svg" placeholder="Danger signs illustration"></image-slot></div>
+      <div style="padding:20px;border-radius:22px;background:#111827;border:1px solid rgba(148,163,184,.14);display:flex;flex-direction:column;gap:14px">
+        <span style="line-height:1.25"><b style="font:700 20px 'Baloo 2'">Not sure if it's serious?</b><br><span style="color:#94A3B8;font-size:15px">पक्का नहीं पता? मदद लेने में देर न करें।</span></span>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+          <a href="tel:108" style="height:56px;border-radius:16px;background:#DC2626;color:#fff;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-phone-call"></i>Call 108</a>
+          <a href="app.dc.html#ashaChat" style="height:56px;border-radius:16px;background:#0F766E;color:#F8FAFC;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;gap:8px"><i class="icon-message-circle"></i>Message ASHA</a>
+        </div>
+        <span style="display:flex;gap:8px;align-items:center;font-size:14px;color:#94A3B8"><i class="icon-users" style="color:#F9A8D4"></i>Tell a family member and keep your MCP card ready.</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-self:start">
+      <div style="border-radius:18px;background:{{ bg0 }};border:1px solid {{ bd0 }};transition:background .2s,border-color .2s">
+        <div onClick="{{ t0 }}" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:14px;padding:16px 18px">
+          <span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(220,38,38,.14);color:#F87171;display:grid;place-items:center;font-size:20px"><i class="icon-droplets"></i></span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25"><span style="font-weight:700;font-size:18px">Heavy Bleeding</span><span style="color:#94A3B8;font-size:14px">ज़्यादा खून बहना</span></span>
+          <span style="width:32px;height:32px;flex:none;border-radius:50%;border:1px solid rgba(252,165,165,.35);color:#FCA5A5;display:grid;place-items:center;font-size:16px;transition:transform .2s;transform:{{ rot0 }}"><i class="icon-chevron-down"></i></span>
+        </div>
+        <sc-if value="{{ o0 }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:0 18px 18px 76px;display:flex;flex-direction:column;gap:14px">
+            <p style="margin:0;color:#E2E8F0;font-size:16px;line-height:1.55;text-wrap:pretty">Bleeding that soaks a pad, or comes with clots or pain. Lie down and go to the nearest hospital now.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="tel:108" style="padding:10px 16px;border-radius:12px;background:#DC2626;color:#fff;font-weight:700;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-phone"></i>Call 108</a><a href="app.dc.html#nearby" style="padding:10px 16px;border-radius:12px;background:#1F2937;color:#F8FAFC;font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-hospital"></i>Nearest hospital</a></div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="border-radius:18px;background:{{ bg1 }};border:1px solid {{ bd1 }};transition:background .2s,border-color .2s">
+        <div onClick="{{ t1 }}" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:14px;padding:16px 18px">
+          <span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(220,38,38,.14);color:#F87171;display:grid;place-items:center;font-size:20px"><i class="icon-baby"></i></span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25"><span style="font-weight:700;font-size:18px">Reduced Fetal Movement</span><span style="color:#94A3B8;font-size:14px">बच्चे की हलचल कम</span></span>
+          <span style="width:32px;height:32px;flex:none;border-radius:50%;border:1px solid rgba(252,165,165,.35);color:#FCA5A5;display:grid;place-items:center;font-size:16px;transition:transform .2s;transform:{{ rot1 }}"><i class="icon-chevron-down"></i></span>
+        </div>
+        <sc-if value="{{ o1 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 18px 18px 76px;display:flex;flex-direction:column;gap:14px">
+            <p style="margin:0;color:#E2E8F0;font-size:16px;line-height:1.55;text-wrap:pretty">Baby moving much less than usual after week 28. Lie on your left side, count kicks, and contact your ASHA or facility.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="tel:108" style="padding:10px 16px;border-radius:12px;background:#DC2626;color:#fff;font-weight:700;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-phone"></i>Call 108</a><a href="app.dc.html#nearby" style="padding:10px 16px;border-radius:12px;background:#1F2937;color:#F8FAFC;font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-hospital"></i>Nearest hospital</a></div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="border-radius:18px;background:{{ bg2 }};border:1px solid {{ bd2 }};transition:background .2s,border-color .2s">
+        <div onClick="{{ t2 }}" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:14px;padding:16px 18px">
+          <span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(220,38,38,.14);color:#F87171;display:grid;place-items:center;font-size:20px"><i class="icon-brain"></i></span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25"><span style="font-weight:700;font-size:18px">Severe Headache</span><span style="color:#94A3B8;font-size:14px">तेज़ सिरदर्द</span></span>
+          <span style="width:32px;height:32px;flex:none;border-radius:50%;border:1px solid rgba(252,165,165,.35);color:#FCA5A5;display:grid;place-items:center;font-size:16px;transition:transform .2s;transform:{{ rot2 }}"><i class="icon-chevron-down"></i></span>
+        </div>
+        <sc-if value="{{ o2 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 18px 18px 76px;display:flex;flex-direction:column;gap:14px">
+            <p style="margin:0;color:#E2E8F0;font-size:16px;line-height:1.55;text-wrap:pretty">A headache that won't go away, especially with blurred vision or swelling, can mean high BP. Get checked today.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="tel:108" style="padding:10px 16px;border-radius:12px;background:#DC2626;color:#fff;font-weight:700;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-phone"></i>Call 108</a><a href="app.dc.html#nearby" style="padding:10px 16px;border-radius:12px;background:#1F2937;color:#F8FAFC;font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-hospital"></i>Nearest hospital</a></div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="border-radius:18px;background:{{ bg3 }};border:1px solid {{ bd3 }};transition:background .2s,border-color .2s">
+        <div onClick="{{ t3 }}" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:14px;padding:16px 18px">
+          <span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(220,38,38,.14);color:#F87171;display:grid;place-items:center;font-size:20px"><i class="icon-zap"></i></span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25"><span style="font-weight:700;font-size:18px">Convulsions</span><span style="color:#94A3B8;font-size:14px">दौरे पड़ना</span></span>
+          <span style="width:32px;height:32px;flex:none;border-radius:50%;border:1px solid rgba(252,165,165,.35);color:#FCA5A5;display:grid;place-items:center;font-size:16px;transition:transform .2s;transform:{{ rot3 }}"><i class="icon-chevron-down"></i></span>
+        </div>
+        <sc-if value="{{ o3 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 18px 18px 76px;display:flex;flex-direction:column;gap:14px">
+            <p style="margin:0;color:#E2E8F0;font-size:16px;line-height:1.55;text-wrap:pretty">Fits or shaking of the body. Turn her on her side, keep her safe, and call 108 immediately.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="tel:108" style="padding:10px 16px;border-radius:12px;background:#DC2626;color:#fff;font-weight:700;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-phone"></i>Call 108</a><a href="app.dc.html#nearby" style="padding:10px 16px;border-radius:12px;background:#1F2937;color:#F8FAFC;font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-hospital"></i>Nearest hospital</a></div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="border-radius:18px;background:{{ bg4 }};border:1px solid {{ bd4 }};transition:background .2s,border-color .2s">
+        <div onClick="{{ t4 }}" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:14px;padding:16px 18px">
+          <span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(220,38,38,.14);color:#F87171;display:grid;place-items:center;font-size:20px"><i class="icon-wind"></i></span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25"><span style="font-weight:700;font-size:18px">Breathing Difficulty</span><span style="color:#94A3B8;font-size:14px">साँस लेने में तकलीफ़</span></span>
+          <span style="width:32px;height:32px;flex:none;border-radius:50%;border:1px solid rgba(252,165,165,.35);color:#FCA5A5;display:grid;place-items:center;font-size:16px;transition:transform .2s;transform:{{ rot4 }}"><i class="icon-chevron-down"></i></span>
+        </div>
+        <sc-if value="{{ o4 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 18px 18px 76px;display:flex;flex-direction:column;gap:14px">
+            <p style="margin:0;color:#E2E8F0;font-size:16px;line-height:1.55;text-wrap:pretty">Struggling to breathe at rest, or chest pain. Sit upright and get emergency help.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="tel:108" style="padding:10px 16px;border-radius:12px;background:#DC2626;color:#fff;font-weight:700;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-phone"></i>Call 108</a><a href="app.dc.html#nearby" style="padding:10px 16px;border-radius:12px;background:#1F2937;color:#F8FAFC;font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-hospital"></i>Nearest hospital</a></div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="border-radius:18px;background:{{ bg5 }};border:1px solid {{ bd5 }};transition:background .2s,border-color .2s">
+        <div onClick="{{ t5 }}" style="cursor:pointer;user-select:none;display:flex;align-items:center;gap:14px;padding:16px 18px">
+          <span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(220,38,38,.14);color:#F87171;display:grid;place-items:center;font-size:20px"><i class="icon-thermometer"></i></span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25"><span style="font-weight:700;font-size:18px">High Fever</span><span style="color:#94A3B8;font-size:14px">तेज़ बुखार</span></span>
+          <span style="width:32px;height:32px;flex:none;border-radius:50%;border:1px solid rgba(252,165,165,.35);color:#FCA5A5;display:grid;place-items:center;font-size:16px;transition:transform .2s;transform:{{ rot5 }}"><i class="icon-chevron-down"></i></span>
+        </div>
+        <sc-if value="{{ o5 }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:0 18px 18px 76px;display:flex;flex-direction:column;gap:14px">
+            <p style="margin:0;color:#E2E8F0;font-size:16px;line-height:1.55;text-wrap:pretty">Fever with chills or foul-smelling discharge. Drink fluids and visit your PHC the same day.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><a href="tel:108" style="padding:10px 16px;border-radius:12px;background:#DC2626;color:#fff;font-weight:700;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-phone"></i>Call 108</a><a href="app.dc.html#nearby" style="padding:10px 16px;border-radius:12px;background:#1F2937;color:#F8FAFC;font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center"><i class="icon-hospital"></i>Nearest hospital</a></div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="max-width:1240px;margin:0 auto;padding:72px 24px">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:40px;align-items:stretch">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="color:#FCA5A5;font-weight:600;font-size:15px">Emergency safety net · आपातकालीन सुरक्षा</span>
+      <h2 style="margin:0;font:700 clamp(30px,3.6vw,44px)/1.1 'Baloo 2';text-wrap:balance">Help When You Need It Most</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-top:8px">
+        <a href="tel:108" style="padding:22px;border-radius:22px;background:#DC2626;color:#fff;display:flex;flex-direction:column;gap:10px;min-height:150px"><i class="icon-ambulance" style="font-size:30px"></i><span style="margin-top:auto;font:700 24px 'Baloo 2'">Call 108</span><span style="font-size:14px;color:#FECACA">Ambulance · एम्बुलेंस</span></a>
+        <div style="padding:22px;border-radius:22px;background:#111827;border:1px solid rgba(220,38,38,.3);display:flex;flex-direction:column;gap:10px;min-height:150px"><i class="icon-map-pin" style="font-size:30px;color:#F87171"></i><span style="margin-top:auto;font:700 22px 'Baloo 2'">Share Location</span><span style="font-size:14px;color:#94A3B8">लोकेशन भेजें</span></div>
+        <div style="padding:22px;border-radius:22px;background:#111827;border:1px solid rgba(220,38,38,.3);display:flex;flex-direction:column;gap:10px;min-height:150px"><i class="icon-hospital" style="font-size:30px;color:#F87171"></i><span style="margin-top:auto;font:700 22px 'Baloo 2'">Nearby Facilities</span><span style="font-size:14px;color:#94A3B8">नज़दीकी अस्पताल</span></div>
+        <div style="padding:22px;border-radius:22px;background:#111827;border:1px solid rgba(220,38,38,.3);display:flex;flex-direction:column;gap:10px;min-height:150px"><i class="icon-stethoscope" style="font-size:30px;color:#F87171"></i><span style="margin-top:auto;font:700 22px 'Baloo 2'">Assigned ASHA</span><span style="font-size:14px;color:#94A3B8">आशा दीदी को सूचना</span></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="height:200px;border-radius:24px;overflow:hidden;border:1px solid rgba(220,38,38,.2);background:#140D12"><image-slot id="emergency-support" shape="rect" fit="contain" src="illustrations/emergency-support.svg" placeholder="Emergency support illustration"></image-slot></div>
+      <div style="padding:24px;border-radius:24px;background:#1A0A0D;border:1px solid rgba(220,38,38,.3);display:flex;flex-direction:column;gap:14px">
+        <b style="font:700 18px 'Baloo 2';color:#FECACA">What happens when you tap SOS</b>
+        <div style="display:flex;gap:14px;align-items:center;font-size:16px"><span style="width:30px;height:30px;border-radius:50%;background:#22C55E;color:#052e16;display:grid;place-items:center"><i class="icon-check"></i></span>Location identified</div>
+        <div style="display:flex;gap:14px;align-items:center;font-size:16px"><span style="width:30px;height:30px;border-radius:50%;background:#22C55E;color:#052e16;display:grid;place-items:center"><i class="icon-check"></i></span>Nearest facility found</div>
+        <div style="display:flex;gap:14px;align-items:center;font-size:16px"><span style="width:30px;height:30px;border-radius:50%;background:#22C55E;color:#052e16;display:grid;place-items:center"><i class="icon-check"></i></span>Assigned ASHA notified</div>
+        <div style="display:flex;gap:14px;align-items:center;font-size:16px"><span style="width:30px;height:30px;border-radius:50%;background:#22C55E;color:#052e16;display:grid;place-items:center"><i class="icon-check"></i></span>Backup ASHA identified</div>
+        <div style="display:flex;gap:14px;align-items:center;font-size:16px;color:#FDE68A;font-weight:600"><span style="width:30px;height:30px;border-radius:50%;border:3px solid #EAB308;border-right-color:transparent"></span>Emergency contact ready</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ecosystem" style="background:#0D1326;border-top:1px solid rgba(148,163,184,.1);border-bottom:1px solid rgba(148,163,184,.1)">
+  <div style="max-width:1240px;margin:0 auto;padding:96px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr));gap:56px;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <span style="color:#5EEAD4;font-weight:600;font-size:15px">Healthcare ecosystem · स्वास्थ्य तंत्र</span>
+      <h2 style="margin:0;font:700 clamp(30px,3.6vw,44px)/1.1 'Baloo 2';text-wrap:balance">Connecting mothers with the right care, faster</h2>
+      <p style="margin:0;color:#CBD5E1;font-size:19px;line-height:1.55">Janamdatri does not replace healthcare workers.</p>
+      <p style="margin:0;color:#94A3B8;font-size:18px;line-height:1.55">It helps connect mothers with the right care faster.</p>
+      <div style="display:flex;flex-direction:column;border-top:1px solid rgba(148,163,184,.15);margin-top:12px">
+        <div style="padding:16px 0;border-bottom:1px solid rgba(148,163,184,.15);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap"><span style="font:600 18px 'Baloo 2'">Never replaces doctors</span><span style="color:#94A3B8">डॉक्टर की जगह नहीं</span></div>
+        <div style="padding:16px 0;border-bottom:1px solid rgba(148,163,184,.15);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap"><span style="font:600 18px 'Baloo 2'">No risk percentages, only clear next steps</span><span style="color:#94A3B8">साफ़ अगला कदम</span></div>
+        <div style="padding:16px 0;border-bottom:1px solid rgba(148,163,184,.15);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap"><span style="font:600 18px 'Baloo 2'">Early intervention</span><span style="color:#94A3B8">समय पर पहचान</span></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:stretch;gap:0;max-width:440px;width:100%;justify-self:center">
+      <div style="padding:16px 20px;border-radius:20px;background:#1E1430;border:1px solid rgba(244,114,182,.4);display:flex;align-items:center;gap:14px"><i class="icon-baby" style="font-size:24px;color:#F472B6"></i><b style="font:700 19px 'Baloo 2';flex:1">Mother</b><span style="color:#94A3B8;font-size:14px">माँ</span></div>
+      <span style="align-self:center;width:2px;height:22px;background:#334155"></span>
+      <div style="padding:20px;border-radius:22px;background:#0F766E;display:flex;align-items:center;gap:14px;box-shadow:0 0 0 6px rgba(20,184,166,.15)"><span style="width:36px;height:36px;border-radius:12px;background:#F8FAFC;color:#0F766E;display:grid;place-items:center;font:700 18px 'Baloo 2'">ज</span><b style="font:700 21px 'Baloo 2';flex:1">Janamdatri</b><span style="color:#CCFBF1;font-size:14px">guidance + navigation</span></div>
+      <span style="align-self:center;width:2px;height:22px;background:#334155"></span>
+      <div style="padding:16px 20px;border-radius:20px;background:#111827;border:1px solid rgba(34,197,94,.4);display:flex;align-items:center;gap:14px"><i class="icon-stethoscope" style="font-size:24px;color:#4ADE80"></i><b style="font:700 19px 'Baloo 2';flex:1">ASHA Worker</b><span style="color:#94A3B8;font-size:14px">village</span></div>
+      <span style="align-self:center;width:2px;height:22px;background:#334155"></span>
+      <div style="padding:16px 20px;border-radius:20px;background:#111827;border:1px solid rgba(148,163,184,.18);display:flex;align-items:center;gap:14px"><i class="icon-hospital" style="font-size:24px;color:#22C55E"></i><b style="font:700 19px 'Baloo 2';flex:1">PHC</b><span style="color:#94A3B8;font-size:14px">routine care</span></div>
+      <span style="align-self:center;width:2px;height:22px;background:#334155"></span>
+      <div style="padding:16px 20px;border-radius:20px;background:#111827;border:1px solid rgba(148,163,184,.18);display:flex;align-items:center;gap:14px"><i class="icon-hospital" style="font-size:24px;color:#F97316"></i><b style="font:700 19px 'Baloo 2';flex:1">CHC</b><span style="color:#94A3B8;font-size:14px">medical review</span></div>
+      <span style="align-self:center;width:2px;height:22px;background:#334155"></span>
+      <div style="padding:16px 20px;border-radius:20px;background:#111827;border:1px solid rgba(148,163,184,.18);display:flex;align-items:center;gap:14px"><i class="icon-hospital" style="font-size:24px;color:#EF4444"></i><b style="font:700 19px 'Baloo 2';flex:1">District Hospital</b><span style="color:#94A3B8;font-size:14px">emergency</span></div>
+      <div style="margin-top:20px;height:200px;border-radius:22px;overflow:hidden;border:1px solid rgba(148,163,184,.14);background:#111827"><image-slot id="healthcare-ecosystem" shape="rect" fit="contain" src="illustrations/healthcare-ecosystem.svg" placeholder="Healthcare ecosystem / nearby care illustration"></image-slot></div>
+    </div>
+  </div>
+</section>
+
+<section style="max-width:1240px;margin:0 auto;padding:96px 24px">
+  <div style="border-radius:36px;background:#0F766E;padding:clamp(32px,6vw,72px);display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;position:relative;overflow:hidden">
+    <div style="position:absolute;width:420px;height:420px;border-radius:50%;background:#14B8A6;opacity:.35;right:-120px;top:-180px"></div>
+    <div style="position:absolute;width:260px;height:260px;border-radius:50%;background:#F472B6;opacity:.25;left:-80px;bottom:-120px"></div>
+    <h2 style="position:relative;margin:0;font:800 clamp(34px,4.6vw,56px)/1.05 'Baloo 2';text-wrap:balance">Your Pregnancy Journey Deserves Support</h2>
+    <p style="position:relative;margin:0;font-size:19px;color:#CCFBF1;max-width:640px;text-wrap:pretty">Guidance, wellbeing, healthcare access and trusted human support in one platform.</p>
+    <p style="position:relative;margin:0;font-size:16px;color:#99F6E4">आपकी गर्भावस्था यात्रा को सहारा मिलना चाहिए।</p>
+    <div style="position:relative;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding-top:8px">
+      <a href="app.dc.html#mother-signup" style="padding:18px 28px;border-radius:16px;background:#F8FAFC;color:#0B1020;font-weight:700;font-size:18px">Create Health Passport</a>
+      <a href="app.dc.html#mother-signup" style="padding:18px 28px;border-radius:16px;background:rgba(11,16,32,.35);color:#F8FAFC;font-weight:700;font-size:18px">Start Pregnancy Journey</a>
+    </div>
+  </div>
+</section>
+
+<footer style="border-top:1px solid rgba(148,163,184,.12)">
+  <div style="max-width:1240px;margin:0 auto;padding:28px 24px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:#94A3B8;font-size:14px">
+    <span>Janamdatri-AI · For awareness and navigation. In an emergency, call 108.</span>
+    <span style="display:flex;gap:20px"><a href="#" style="color:#94A3B8">Privacy</a><a href="/docs" style="color:#94A3B8">Documentation</a><a href="#" style="color:#94A3B8">Contact</a></span>
+  </div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { open: 0 };
+  renderVals() {
+    const v = {};
+    for (let n = 0; n < 6; n++) {
+      const on = this.state.open === n;
+      v['o' + n] = on;
+      v['bg' + n] = on ? 'rgba(220,38,38,.10)' : '#111827';
+      v['bd' + n] = on ? 'rgba(248,113,113,.5)' : 'rgba(148,163,184,.14)';
+      v['rot' + n] = on ? 'rotate(180deg)' : 'none';
+      v['t' + n] = () => this.setState(s => ({ open: s.open === n ? -1 : n }));
+    }
+    return v;
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Speech to text (Whisper via CTranslate2), OCR (PaddleOCR + Tesseract) and text to speech (Coqui TTS).
+#   run_local:  WITH_AI=1 ./run_local.sh   or   run_local.bat --with-ai
+#   Tesseract also needs the program itself with Hindi: apt install tesseract-ocr tesseract-ocr-hin
+#   (Windows: https://github.com/UB-Mannheim/tesseract/wiki, tick "Hindi"; set TESSERACT_CMD if not on PATH).
+#   Coqui TTS pulls in PyTorch; for CPU-only machines install it first:
+#     pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+faster-whisper>=1.0,<2
+paddlepaddle>=3,<4          # paddlepaddle-gpu on CUDA machines
+paddleocr>=2.10,<3
+pypdfium2>=4.30             # render scanned PDFs for OCR
+pytesseract>=0.3.10,<1      # Tesseract OCR (second engine, Hindi + English)
+coqui-tts>=0.24,<1          # text to speech: VITS (English), XTTS v2 (Hindi)
+
+# Optional, large (pulls in PyTorch): semantic embeddings for the knowledge base.
+#   pip install sentence-transformers  and set EMBEDDING_PROVIDER=sentence_transformers
