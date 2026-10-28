@@ -4,19 +4,21 @@ import uuid
 from datetime import date
 from typing import Literal
 
-from fastapi import APIRouter, Query, status
+from fastapi import APIRouter, Query, Response, status
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 
 from app.api.deps import DB, CurrentAsha, CurrentMother, CurrentPrincipal, asha_can_access, get_current_mother
-from app.asha import service
+from app.asha import area, report, service, worklist
 from app.asha.assignment import assign_asha, reason_text
 from app.core.audit import audit
-from app.core.enums import Role
+from app.core.enums import MessageType, Role
 from app.core.exceptions import Conflict, Forbidden, NotFound, ValidationFailed
 from app.core.security import normalize_phone
 from app.database.models import AshaWorker, Mother, User
+from app.messaging import service as messaging
 from app.messaging.service import presence
+from app.notifications.sms import send_sms
 from app.passport import service as passport_service
 from app.passport.schemas import AboutYou, PassportIn, PregnancyIn
 
@@ -69,7 +71,12 @@ def assigned(db: DB, mother: CurrentMother):
     b = db.get(AshaWorker, mother.backup_asha_id) if mother.backup_asha_id else None
     if not a:
         return {"assigned": None, "backup": None,
-                "message": "Add your village or pincode to your passport and we'll match you with your ASHA."}
+                "message": ("No ASHA worker has joined the app near you yet. You will be connected automatically as soon "
+                            "as one does. Meanwhile the Health Assistant and SOS (108) are always available."
+                            if mother.village or mother.pincode or mother.latitude is not None else
+                            "Add your village or pincode to your passport and we'll match you with your ASHA."),
+                "message_hi": ("आपके पास अभी कोई आशा दीदी ऐप से नहीं जुड़ी हैं। जैसे ही कोई जुड़ेंगी, आप अपने-आप जुड़ जाएँगी। "
+                               "तब तक स्वास्थ्य सहायक और SOS (108) हमेशा उपलब्ध हैं।")}
     return {"assigned": asha_public(a, mother), "backup": asha_public(b, mother),
             "matched_by": mother.assignment_reason, "privacy": "Your phone number remains private.",
             "privacy_hi": "आपका नंबर निजी रहेगा।"}
@@ -130,6 +137,114 @@ def update_me(body: AshaUpdate, db: DB, asha: CurrentAsha):
         setattr(asha, k, v)
     db.commit()
     return me(asha)
+
+
+class LocationIn(BaseModel):
+    latitude: float = Field(ge=-90, le=90)
+    longitude: float = Field(ge=-180, le=180)
+
+
+@router.post("/me/location")
+def set_location(body: LocationIn, db: DB, asha: CurrentAsha):
+    """Set her working area from the phone's GPS; mothers nearby who have no ASHA yet are connected to her."""
+    return area.set_area(db, asha, body.latitude, body.longitude)
+
+
+@router.get("/map")
+def asha_map(db: DB, asha: CurrentAsha):
+    """Her mothers on the map (care level, week, distance) and the PHC / CHC / DH near her."""
+    return area.map_data(db, asha)
+
+
+@router.get("/worklist")
+def todays_worklist(db: DB, asha: CurrentAsha, lat: float | None = Query(None, ge=-90, le=90),
+                    lon: float | None = Query(None, ge=-180, le=180)):
+    """Today's smart work list: each mother's tasks (with reasons), ordered by urgency and then the shortest way
+    from her current position (or her area), with distance and time for each stop."""
+    return worklist.worklist(db, asha, lat, lon)
+
+
+class DoneIn(BaseModel):
+    done: bool = True
+
+
+def _my_mother(db, asha: AshaWorker, mother_id: uuid.UUID) -> Mother:
+    mother = db.get(Mother, mother_id)
+    if not mother or not asha_can_access(asha, mother):
+        raise Forbidden("This mother is not assigned to you")
+    return mother
+
+
+@router.post("/worklist/{mother_id}/done")
+def worklist_done(mother_id: uuid.UUID, body: DoneIn, db: DB, asha: CurrentAsha):
+    """Tick a mother off today's list (recording a visit does this automatically)."""
+    _my_mother(db, asha, mother_id)
+    worklist.mark_done(db, asha, str(mother_id), body.done, date.today())
+    return {"mother_id": str(mother_id), "done": body.done}
+
+
+REMINDERS = {
+    "anc": ("Namaste {name}, your ANC check-up is due. Please go to your PHC on the next check-up day, or tell me a "
+            "good time and I will come. – {asha}, ASHA",
+            "नमस्ते {name}, आपकी ANC जाँच का समय हो गया है। अगले जाँच दिवस पर PHC जाएँ, या मुझे बताएँ कब आऊँ। – {asha}, आशा दीदी"),
+    "ifa": ("Namaste {name}, please take your iron tablet every day after lunch, with lemon water, not tea. – {asha}, ASHA",
+            "नमस्ते {name}, आयरन की गोली रोज़ दोपहर के खाने के बाद नींबू पानी से लें, चाय से नहीं। – {asha}, आशा दीदी"),
+    "birth_prep": ("Namaste {name}, your due date is near. Keep your MCP card, a bag for the hospital and the 102 number "
+                   "ready. – {asha}, ASHA",
+                   "नमस्ते {name}, प्रसव का समय पास है। MCP कार्ड, अस्पताल का थैला और 102 नंबर तैयार रखें। – {asha}, आशा दीदी"),
+    "visit": ("Namaste {name}, I will visit you today. Please call me in the app if this is not a good time. – {asha}, ASHA",
+              "नमस्ते {name}, मैं आज आपसे मिलने आऊँगी। समय ठीक न हो तो ऐप में बताएँ। – {asha}, आशा दीदी"),
+}
+
+
+class RemindIn(BaseModel):
+    kind: Literal["anc", "ifa", "birth_prep", "visit"] = "visit"
+
+
+@router.post("/worklist/{mother_id}/remind")
+def worklist_remind(mother_id: uuid.UUID, body: RemindIn, db: DB, p: CurrentPrincipal, asha: CurrentAsha):
+    """Send her a friendly reminder: in the app chat and by SMS (Mailpit inbox in the prototype). Her number stays hidden."""
+    mother = _my_mother(db, asha, mother_id)
+    en, hi = REMINDERS[body.kind]
+    text = (hi if mother.language == "hi" else en).format(name=(mother.name or "").split(" ")[0] or "didi",
+                                                           asha=asha.name.split(" ")[0])
+    messaging.send(db, p, mother, asha, message_type=MessageType.TEXT, body=text)
+    sms = bool(mother.user and mother.user.phone and send_sms(mother.user.phone, text))
+    db.commit()
+    return {"sent": True, "sms": sms, "text": text}
+
+
+MONTH = Query(None, pattern=r"^\d{4}-(0[1-9]|1[0-2])$", description="YYYY-MM; default this month")
+
+
+def _report(db, asha, month):
+    r = report.build(db, asha, month)
+    r.pop("_mothers", None)
+    return r
+
+
+@router.get("/report")
+def monthly_report(db: DB, asha: CurrentAsha, month: str | None = MONTH,
+                   format: Literal["json", "csv", "html"] = Query("json")):
+    """Monthly work report for the ANM (visits, ANC, high-risk, referrals, deliveries, IFA) and estimated incentives.
+    ``format=csv`` downloads a spreadsheet; ``format=html`` is a printable page (Print → Save as PDF)."""
+    r = _report(db, asha, month)
+    if format == "csv":
+        return Response(report.to_csv(r), media_type="text/csv",
+                        headers={"Content-Disposition": f'attachment; filename="asha-report-{r["month"]}.csv"'})
+    if format == "html":
+        return Response(report.to_html(r), media_type="text/html")
+    return r
+
+
+@router.post("/report/share")
+def share_report(db: DB, asha: CurrentAsha, month: str | None = MONTH):
+    """Send the month's summary to her ANM by SMS (Mailpit inbox in the prototype)."""
+    if not asha.anm_phone:
+        raise ValidationFailed("No ANM mobile number is saved for you", code="anm_phone_missing")
+    r = _report(db, asha, month)
+    text = report.sms_summary(r)
+    return {"sent": send_sms(asha.anm_phone, text), "to": asha.anm_name or "ANM", "text": text}
 
 
 @router.get("/dashboard")

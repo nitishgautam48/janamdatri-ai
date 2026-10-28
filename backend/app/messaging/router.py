@@ -12,6 +12,7 @@ from app.ai.whisper import get_whisper
 from app.api.deps import DB, CurrentAsha, CurrentPrincipal
 from app.core.enums import MessageType
 from app.core.exceptions import Forbidden, NotFound, ValidationFailed
+from app.core.pregnancy import gestational_week
 from app.core.storage import AUDIO_TYPES, IMAGE_TYPES, absolute_path, save_upload
 from app.database.models import Message, Mother
 from app.messaging import service
@@ -111,17 +112,21 @@ def history(db: DB, p: CurrentPrincipal, mother_id: uuid.UUID | None = Query(Non
 
 @router.get("/conversations")
 def conversations(db: DB, asha: CurrentAsha):
-    """ASHA inbox: one row per mother with the last message and unread count."""
+    """ASHA inbox: every mother she looks after, with the last message and unread count (unread first, then latest,
+    then mothers she has not chatted with yet, so she can start a conversation)."""
     mothers = db.scalars(select(Mother).where((Mother.assigned_asha_id == asha.id) | (Mother.backup_asha_id == asha.id))).all()
     out = []
     for mo in mothers:
         last = db.scalar(select(Message).where(Message.mother_id == mo.id, Message.asha_id == asha.id)
                          .order_by(Message.created_at.desc()))
-        if last:
-            out.append({"mother_id": str(mo.id), "name": mo.name, "last_message": service.message_dict(last, "asha"),
-                        "unread": service.unread_count(db, mo.id, asha.id, "asha")})
-    out.sort(key=lambda c: c["last_message"]["created_at"], reverse=True)
-    return {"conversations": out}
+        week = gestational_week(mo.pregnancy.lmp) if mo.pregnancy and mo.pregnancy.lmp else None
+        out.append({"mother_id": str(mo.id), "name": mo.name, "village": mo.village, "week": week,
+                    "has_app": mo.user_id is not None,
+                    "last_message": service.message_dict(last, "asha") if last else None,
+                    "unread": service.unread_count(db, mo.id, asha.id, "asha") if last else 0})
+    out.sort(key=lambda c: (-c["unread"], c["last_message"] is None,
+                            -(c["last_message"]["created_at"].timestamp() if c["last_message"] else 0), (c["name"] or "").lower()))
+    return {"conversations": out, "unread_total": sum(c["unread"] for c in out)}
 
 
 @router.post("/call")

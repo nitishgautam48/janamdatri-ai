@@ -1,5 +1,8 @@
 """Text extraction from report images and PDFs.
 
+- Report photos: cloud vision first when configured (Gemini reads printed and handwritten lab reports very
+  accurately; OCR.space as a second cloud engine), then the local engines below. ``OCR_CLOUD_ENABLED=false``
+  keeps every photo on the server.
 - PDFs with a text layer: read directly with pypdf (fast, exact).
 - Scanned PDFs and photos: PaddleOCR (``pip install paddleocr paddlepaddle``), pages
   rendered with pypdfium2.
@@ -11,10 +14,15 @@ If neither is installed, images return no text and the caller may supply text re
 """
 from __future__ import annotations
 
+import base64
 import logging
+import mimetypes
 import threading
 from pathlib import Path
 
+import httpx
+
+from app.ai import usage
 from app.core.config import settings
 
 log = logging.getLogger(__name__)
@@ -49,7 +57,7 @@ _tess_ok: bool | None = None
 
 def tesseract_available() -> bool:
     global _tess_ok
-    if settings.ocr_provider in ("text_only", "paddle"):
+    if settings.ocr_provider in ("text_only", "paddle", "gemini", "ocrspace"):
         return False
     if _tess_ok is None:
         try:
@@ -79,8 +87,53 @@ def _tesseract_image(path: str) -> str:
         return pytesseract.image_to_string(img.convert("L"), lang=langs, config="--psm 6")
 
 
+VISION_PROMPT = ("Transcribe all the text in this medical / lab report image exactly as printed, line by line. "
+                 "Keep every test name with its value, unit and reference range on one line. Do not explain, "
+                 "summarise or add anything; if there is no readable text, reply with nothing.")
+
+
+def _cloud_ok() -> bool:
+    return settings.ocr_cloud_enabled and settings.ocr_provider in ("auto", "gemini", "ocrspace")
+
+
+def _gemini_image(path: str) -> str:
+    if not usage.allow("ai", settings.ai_daily_limit):
+        return ""
+    mime = mimetypes.guess_type(path)[0] or "image/jpeg"
+    data = base64.b64encode(Path(path).read_bytes()).decode()
+    body = {"model": settings.gemini_model, "max_tokens": 2000, "temperature": 0,
+            "messages": [{"role": "user", "content": [
+                {"type": "text", "text": VISION_PROMPT},
+                {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{data}"}}]}]}
+    if settings.gemini_reasoning_effort:
+        body["reasoning_effort"] = settings.gemini_reasoning_effort
+    usage.add("ai")
+    with httpx.Client(timeout=60) as c:
+        r = c.post(f"{settings.gemini_base_url.rstrip('/')}/chat/completions", json=body,
+                   headers={"Authorization": f"Bearer {settings.gemini_api_key}"})
+        r.raise_for_status()
+    return (r.json()["choices"][0]["message"].get("content") or "").strip()
+
+
+def _ocrspace_image(path: str) -> str:
+    with open(path, "rb") as fh, httpx.Client(timeout=60) as c:
+        r = c.post("https://api.ocr.space/parse/image",
+                   data={"apikey": settings.ocrspace_api_key, "language": "eng", "OCREngine": "2",
+                         "scale": "true", "isTable": "true"},
+                   files={"file": (Path(path).name, fh, mimetypes.guess_type(path)[0] or "image/jpeg")})
+        r.raise_for_status()
+    j = r.json()
+    if j.get("IsErroredOnProcessing"):
+        raise RuntimeError(str(j.get("ErrorMessage")))
+    return "\n".join(p.get("ParsedText", "") for p in j.get("ParsedResults") or []).strip()
+
+
 def ocr_engines() -> list[str]:
     engines = []
+    if _cloud_ok() and settings.gemini_api_key and settings.ocr_provider in ("auto", "gemini"):
+        engines.append("gemini")
+    if _cloud_ok() and settings.ocrspace_api_key and settings.ocr_provider in ("auto", "ocrspace"):
+        engines.append("ocrspace")
     if paddle_available() and settings.ocr_provider in ("auto", "paddle"):
         engines.append("paddleocr")
     if tesseract_available():
@@ -89,11 +142,14 @@ def ocr_engines() -> list[str]:
 
 
 def _ocr_image(path: str) -> tuple[str, str]:
-    """Best text from the available engines: PaddleOCR first, Tesseract if Paddle is missing or reads little."""
+    """Best text from the available engines, in order (cloud vision, PaddleOCR, Tesseract); stops once one reads
+    the report well."""
     text, engine = "", "unavailable"
+    readers = {"gemini": _gemini_image, "ocrspace": _ocrspace_image, "paddleocr": _paddle_image,
+               "tesseract": _tesseract_image}
     for name in ocr_engines():
         try:
-            out = _paddle_image(path) if name == "paddleocr" else _tesseract_image(path)
+            out = readers[name](path)
         except Exception as exc:
             log.warning("%s failed on %s: %s", name, Path(path).name, exc)
             continue

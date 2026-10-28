@@ -1,0 +1,40 @@
+# Public server (e.g. an Azure VM): HTTPS on your domain, nothing else exposed.
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# Needs in .env: DOMAIN (e.g. janamdatri.centralindia.cloudapp.azure.com), JWT_SECRET, ADMIN_PASSWORD,
+# POSTGRES_PASSWORD and MAILPIT_UI_AUTH (user:password for the SMS inbox at https://DOMAIN/mailpit/).
+x-prod-env: &prod-env
+  ENVIRONMENT: production
+  PUBLIC_BASE_URL: https://${DOMAIN:?set DOMAIN in .env}
+  MAILPIT_UI_URL: https://${DOMAIN}/mailpit/
+  CORS_ORIGINS: '["https://${DOMAIN}"]'
+  WEB_CONCURRENCY: "2"
+
+services:
+  api:
+    ports: !reset []
+    environment: *prod-env
+  worker:
+    environment: *prod-env
+  beat:
+    environment: *prod-env
+
+  mailpit:
+    ports: !reset []
+    environment:
+      MP_WEBROOT: /mailpit/
+      MP_UI_AUTH: ${MAILPIT_UI_AUTH:?set MAILPIT_UI_AUTH=user:password in .env}
+
+  caddy:
+    image: caddy:2-alpine
+    ports: ["80:80", "443:443"]
+    environment: {DOMAIN: "${DOMAIN}"}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [api, mailpit]
+    restart: unless-stopped
+
+volumes:
+  caddy-data:
+  caddy-config:

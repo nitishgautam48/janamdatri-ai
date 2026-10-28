@@ -17,7 +17,7 @@ Backend for **Janamdatri-AI (जन्मदात्री)**, a maternal healt
 > It supports, and never replaces, doctors, ANMs and ASHA workers. Assessment results are care levels, never percentages.
 
 **Stack:** FastAPI · PostgreSQL · SQLAlchemy 2 · Alembic · Redis · JWT · Pydantic v2 · Celery · Docker
-**AI:** Gemma 3 Instruct (Ollama or vLLM) · Whisper Large V3 (faster-whisper) · PaddleOCR · FAISS · gradient boosting (scikit-learn) · clinical rules engine
+**AI:** Gemini / Groq / OpenRouter (cloud, with redaction and free-limit caps) · Azure AI Speech · Gemini vision OCR · optional local models (Ollama, faster-whisper, PaddleOCR, Coqui) · FAISS hybrid search · gradient boosting (scikit-learn) · clinical rules engine
 
 ---
 
@@ -38,7 +38,7 @@ python -m scripts.smoke_test http://localhost:8000 # end-to-end journey over HTT
 ### Tests
 
 ```bash
-pytest                       # SQLite + in-memory store (47 tests)
+pytest                       # SQLite + in-memory store (115 tests)
 
 # Same suite on PostgreSQL + Redis:
 TEST_DATABASE_URL=postgresql+psycopg://…/janamdatri_test TEST_REDIS_URL=redis://localhost:6379/0 pytest
@@ -48,21 +48,20 @@ The starter reference data (`SEED_REFERENCE_DATA=true`) loads facilities around 
 
 ---
 
-## AI models: offline by default, real models when configured
+## AI providers: cloud first, local backup, knowledge base last
 
-| Capability | Default (no GPU, no downloads) | Production setting |
+| Capability | Order (first one set up wins) | Without any key |
 |---|---|---|
-| LLM (Gemma 3 Instruct) | If Ollama isn't running, answers come from the curated knowledge base | `ollama` (default, `gemma3:12b`) or `openai` for any OpenAI-compatible server, e.g. vLLM `google/gemma-3-12b-it` |
-| Speech-to-text | Voice input off | `WHISPER_PROVIDER=auto` uses faster-whisper `large-v3` when installed |
-| OCR | Text layer of PDFs; on-device OCR text via `client_text` | PaddleOCR when installed (`pip install -r requirements-ai.txt`) |
-| Retrieval | FAISS over TF-IDF feature hashing (English, Hindi, Hinglish) | `EMBEDDING_PROVIDER=sentence_transformers` (multilingual-e5) |
-| Risk model | `HistGradientBoostingClassifier`, trained on a synthetic clinical cohort | Retrain on de-identified data: `python -m scripts.train_risk_model data.csv` |
+| Language model (assistant, Talk To Me, reports, tips) | Gemini `gemini-2.5-flash` → Groq `openai/gpt-oss-120b` → OpenRouter → local Ollama | Grounded answers from the 230-topic knowledge base |
+| Speech-to-text | Groq `whisper-large-v3` (turbo if busy) → Azure Speech (hi-IN / en-IN) → local faster-whisper. Short word hints per use (chat, visit notes; none for names), a repeated hint is re-heard without it, unsure text is tried in the app's language | Voice input off; typing works |
+| Text-to-speech | Azure neural voices (`hi-IN-SwaraNeural`, `en-IN-NeerjaNeural`) → local Coqui | Phone / browser voice |
+| Report photos | Gemini vision → OCR.space → PaddleOCR → Tesseract | Text layer of PDFs; on-device text via `client_text` |
+| Retrieval | Hybrid: keyword hashing + Gemini embeddings (or nomic-embed in Ollama) | Keyword hashing (English, Hindi, Hinglish) |
+| Road routes | Azure Maps → OSRM | Straight-line estimate |
+| Risk model | `HistGradientBoostingClassifier` on a synthetic clinical cohort (local, never cloud) | same |
 
-Gemma 3 comes in 1B, 4B, 12B and 27B sizes; there is no 9B. The default is `gemma3:12b`, and `LLM_MODEL` switches it.
-
-If the model server is down, every AI feature falls back to grounded templates, so the app keeps working.
-
----
+Cloud requests are redacted (`app/ai/redact.py`), counted against daily / monthly caps (`app/ai/usage.py`), and a
+failing or rate-limited model is skipped for a while. Settings and defaults: `app/core/config.py` and `.env.example`.
 
 ## Architecture
 
@@ -75,7 +74,8 @@ app/
 ├── visits/        home visit engine (BP, weight, Hb, symptoms, checklist, voice note, next visit)
 ├── assistant/     Health Assistant: Gemma + FAISS retrieval + safety layer, history, "Tell my ASHA"
 ├── voice/         Whisper transcription
-├── companion/     daily planner, meals, medication reminders from reports, hydration, ANC prep, streaks
+├── companion/     daily planner, Plan My Day conversation (understand.py reads her answers, dayplan.py builds and edits the plan),
+│                  meals, medication reminders from reports, hydration, ANC prep, streaks
 ├── emotional/     friend-like "Talk To Me": sentiment, pattern memory, mood trend in words, private
 ├── assessment/    danger ladder, clinical rules, anaemia rules, EPDS, history engine, GBM, worst signal wins
 ├── reports/       upload → OCR → extraction → validation → explanation, Hb trend, medication schedule
@@ -131,11 +131,12 @@ app/
 | Visits | `POST /visit/create`, `POST /visit/{id}/voice-note`, `GET /visit/history` |
 | Assistant | `POST /assistant/chat`, `POST /assistant/voice`, `GET /assistant/history`, `POST /assistant/tell-asha` |
 | Voice | `POST /voice/transcribe` |
-| Companion | `POST /companion/plan`, `GET /companion/today`, `PATCH /companion/today/tasks/{id}`, `POST /companion/hydration`, `GET /companion/week` |
+| Companion | `GET/POST /companion/chat` (Plan My Day conversation), `POST /companion/plan`, `GET /companion/today`, `POST /companion/today/tasks`, `PUT/PATCH/DELETE /companion/today/tasks/{id}`, `POST /companion/hydration`, `GET /companion/week` |
 | Emotional | `POST /emotional/chat`, `GET /emotional/history` |
 | Assessment | `GET /assessment/symptoms`, `POST /assessment`, `GET /assessment/history`, `GET /assessment/latest`, `GET /assessment/{id}` |
 | Reports | `POST /reports/upload`, `POST /reports/analyze`, `GET /reports/history`, `GET /reports/trends`, `GET /reports/medications`, `GET/DELETE /reports/{id}`, `GET /reports/{id}/file` |
-| Knowledge | `GET /guide/week`, `GET /guide/topics`, `POST /knowledge/query` |
+| ASHA work | `POST /asha/me/location` (area from GPS), `GET /asha/map`, `GET /asha/worklist`, `POST /asha/worklist/{id}/remind`, `POST /asha/worklist/{id}/done`, `GET /asha/report` (json / csv / html), `POST /asha/report/share`, `POST /visit/understand` (visit notes → form) |
+| Knowledge | `GET /guide/week`, `POST /guide/ask` (pregnancy-only Q&A with a topic guard), `GET /guide/topics`, `POST /knowledge/query` |
 | GIS | `GET /gis/nearby`, `GET /gis/facilities`, `GET /gis/facilities/{id}`, `GET /gis/recommendation`, `GET /gis/geocode`; admin: `POST/PUT /gis/facilities`, `POST /gis/mappings` |
 | Referral | `POST /referral/generate`, `GET /referral/history`, `GET /referral/{id}`, `GET /referral/{id}/pdf`, `GET /referral/{id}/print`, `GET /referral/shared/{token}`, `PATCH /referral/{id}/status` |
 | Emergency | `POST /emergency/alert` (no login), `POST /emergency/location`, `GET /emergency/facilities`, `GET /emergency/numbers`, `GET /emergency/active`, `GET /emergency/{id}`, `POST /emergency/{id}/acknowledge`, `POST /emergency/{id}/resolve`, `POST /emergency/escalate-due` |

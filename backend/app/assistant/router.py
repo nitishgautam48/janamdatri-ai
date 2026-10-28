@@ -53,6 +53,9 @@ async def voice(db: DB, p: CurrentPrincipal, file: UploadFile = File(...), threa
                                    code="voice_unavailable")
         raise ValidationFailed("We couldn't hear that clearly. Please try again or type your question.",
                                code="no_speech", details={"engine": t["engine"]})
+    if not t["confident"]:  # the voice engine was unsure: let her check the words instead of answering a guess
+        raise ValidationFailed("Please check what we heard, then send it.", code="unclear_speech",
+                               details={"text": t["text"]})
     out = service.chat(db, p, mother, t["text"], thread_id, language, input_mode="voice")
     out["transcript"] = {"text": t["text"], "language": t["language"], "engine": t["engine"]}
     return out

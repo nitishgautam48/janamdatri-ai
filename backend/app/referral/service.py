@@ -15,6 +15,7 @@ from app.core.config import settings
 from app.core.enums import CareLevel, MessageType, NotificationType, ReferralStatus, Role
 from app.core.exceptions import NotFound, ValidationFailed
 from app.core.pregnancy import gestational_week
+from app.core.request_ctx import public_base
 from app.database.base import utcnow
 from app.database.models import AshaWorker, Assessment, Facility, Message, Mother, Referral
 from app.gis.service import facility_dict, mother_location, recommend_facility
@@ -99,7 +100,7 @@ def generate(db: Session, p: Principal, mother: Mother, *, assessment_id=None, c
                data={"referral_id": str(ref.id), "mother_id": str(mother.id)})
     if facility and facility.get("phone") and level >= CareLevel.MEDICAL_REVIEW:
         send_sms(facility["phone"], f"Janamdatri referral {ref.referral_number}: {mother.name or 'patient'}, "
-                                     f"wk {week or '-'}, {level.label}. {settings.public_base_url}{settings.api_prefix}/referral/shared/"
+                                     f"wk {week or '-'}, {level.label}. {public_base()}{settings.api_prefix}/referral/shared/"
                                      f"{ref.share_token}?format=html")
         ref.facility_notified = True
     return ref
@@ -117,7 +118,7 @@ def referral_dict(r: Referral, *, include_share: bool = True) -> dict:
         "downloads": {"pdf": f"/api/v1/referral/{r.id}/pdf", "print": f"/api/v1/referral/{r.id}/print"},
     }
     if include_share:
-        d["share"] = {"url": f"{settings.public_base_url}{settings.api_prefix}/referral/shared/{r.share_token}",
+        d["share"] = {"url": f"{public_base()}{settings.api_prefix}/referral/shared/{r.share_token}",
                       "expires_at": r.share_expires_at}
     return d
 

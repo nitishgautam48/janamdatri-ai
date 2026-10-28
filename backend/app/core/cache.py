@@ -41,10 +41,10 @@ class MemoryStore:
         with self._lock:
             self._data.pop(key, None)
 
-    def incr(self, key: str, ex: int | None = None) -> int:
+    def incr(self, key: str, ex: int | None = None, amount: int = 1) -> int:
         with self._lock:
             item = self._alive(key)
-            value = int(item[0]) + 1 if item else 1
+            value = int(item[0]) + amount if item else amount
             expiry = item[1] if item else (time.time() + ex if ex else None)
             self._data[key] = (str(value), expiry)
             return value
@@ -70,9 +70,9 @@ class RedisStore:
     def delete(self, key: str) -> None:
         self._r.delete(key)
 
-    def incr(self, key: str, ex: int | None = None) -> int:
+    def incr(self, key: str, ex: int | None = None, amount: int = 1) -> int:
         pipe = self._r.pipeline()
-        pipe.incr(key)
+        pipe.incr(key, amount)
         if ex:
             pipe.expire(key, ex, nx=True)
         return int(pipe.execute()[0])

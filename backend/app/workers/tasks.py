@@ -58,3 +58,16 @@ def analytics_snapshot():
 
     with SessionLocal() as db:
         return str(take_snapshot(db).snapshot_date)
+
+
+@celery.task
+def asha_alerts(kind: str):
+    """morning: today's work list to each ASHA · evening: 'ASHA visits tomorrow' to mothers · weekly: quiet mothers."""
+    from app.notifications import reminders
+
+    run = {"morning": reminders.asha_morning_summary, "evening": reminders.visit_tomorrow_reminders,
+           "weekly": reminders.quiet_mother_alerts}[kind]
+    with SessionLocal() as db:
+        n = run(db)
+        db.commit()
+        return n

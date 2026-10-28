@@ -1,0 +1,11 @@
+# Share the app on a free public HTTPS link (Cloudflare quick tunnel): no account, no install, no open ports.
+#   Windows:  share.bat          macOS / Linux:  ./share.sh
+#   or:       docker compose -f docker-compose.yml -f docker-compose.tunnel.yml up -d
+# The link looks like https://random-words.trycloudflare.com and changes every time the tunnel restarts.
+# Only the app is shared; the SMS inbox (Mailpit) stays private on this computer.
+services:
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://api:8000
+    depends_on: [api]
+    restart: unless-stopped

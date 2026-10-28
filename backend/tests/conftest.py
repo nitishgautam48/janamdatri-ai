@@ -23,6 +23,9 @@ os.environ.update({
     "OSM_ENABLED": "false",
     "EMBEDDING_PROVIDER": "hashing",
     "TTS_PROVIDER": "off",  # tests never call the internet; OpenStreetMap is tested with recorded responses
+    # Real keys in a developer's .env must never reach the tests: cloud providers are tested with fakes.
+    "GEMINI_API_KEY": "", "GROQ_API_KEY": "", "OPENROUTER_API_KEY": "", "AZURE_SPEECH_KEY": "",
+    "AZURE_MAPS_KEY": "", "OCRSPACE_API_KEY": "", "ROUTING_PROVIDER": "off", "ORS_API_KEY": "", "MAPTILER_KEY": "",
     "ADMIN_EMAIL": "admin@test.local",
     "ADMIN_PASSWORD": "AdminPass!123",
 })
@@ -45,9 +48,12 @@ def client():
 
 @pytest.fixture(autouse=True)
 def _clear_rate_limits():
+    from app.ai import llm
+
     store = get_store()
     if hasattr(store, "flush"):
         store.flush()
+    llm._down_until.clear()  # a model marked down by one test must not leak into the next
     yield
 
 

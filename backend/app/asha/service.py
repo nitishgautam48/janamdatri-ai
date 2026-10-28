@@ -67,6 +67,12 @@ def mother_row(db: Session, m: Mother, asha: AshaWorker | None = None) -> dict:
     }
 
 
+def _followed(r, v) -> bool:
+    from app.asha.priority import followed_up
+
+    return followed_up(r, v)
+
+
 def classify(db: Session, m: Mother, today: date) -> set[str]:
     tags = set()
     preg = m.pregnancy
@@ -77,12 +83,12 @@ def classify(db: Session, m: Mother, today: date) -> set[str]:
         tags.add("anc_due")
     r = _latest_result(db, m.id)
     v = _latest_visit(db, m.id)
-    if r and r.level >= CareLevel.NEEDS_ATTENTION and (not v or v.visit_date < r.created_at):
+    if r and r.level >= CareLevel.NEEDS_ATTENTION and not _followed(r, v):
         tags.add("follow_up")
     if v and v.next_visit_date and v.next_visit_date <= today:
         tags.add("follow_up")
         tags.add("visit_today")
-    if r and r.level >= CareLevel.MEDICAL_REVIEW and (not v or v.visit_date < r.created_at):
+    if r and r.level >= CareLevel.MEDICAL_REVIEW and not _followed(r, v):
         tags.add("visit_today")
         tags.add("high_risk")
     return tags
@@ -117,6 +123,8 @@ def dashboard(db: Session, asha: AshaWorker) -> dict:
 
     return {
         "greeting": f"नमस्ते, {asha.name.split(' ')[0]} didi",
+        "area": {"has_location": asha.latitude is not None, "place": ", ".join(
+            x for x in dict.fromkeys([asha.village, asha.district]) if x) or None},
         "asha": {"name": asha.name, "sub_centre": asha.sub_centre_name or asha.sub_centre_code, "verified": asha.verified,
                  "available": asha.available, "presence": presence(asha)},
         "counts": {"assigned_mothers": len(mothers), "todays_visits": len(visits_today),
@@ -140,5 +148,11 @@ def list_mothers(db: Session, asha: AshaWorker, filter_: str | None, q: str | No
             continue
         if filter_ and filter_ not in classify(db, m, today):
             continue
-        rows.append(mother_row(db, m, asha))
+        from app.asha.worklist import prioritise
+
+        pr = prioritise(db, m, today)
+        rows.append({**mother_row(db, m, asha), "priority_score": pr["score"], "priority_band": pr["band"],
+                     "priority_label": pr["band_label"], "priority_label_hi": pr["band_label_hi"],
+                     "priority_reasons": pr["reasons"][:3], "emergency": pr["emergency"]})
+    rows.sort(key=lambda r: (-r["priority_score"], (r["name"] or "").lower()))
     return rows

@@ -258,7 +258,7 @@
         <div style="display:flex;justify-content:space-between;align-items:center"><i onClick="{{ goAshaDash }}" class="icon-arrow-left" style="cursor:pointer;font-size:22px"></i><b style="font-size:17px">My Mothers · मेरी माताएँ</b><span onClick="{{ goRegister }}" style="cursor:pointer;width:36px;height:36px;border-radius:12px;background:#0F766E;display:grid;place-items:center"><i class="icon-user-plus"></i></span></div>
         <div style="height:46px;border-radius:14px;background:#111827;padding:0 14px;display:flex;align-items:center;gap:10px"><i class="icon-search" style="color:#94A3B8"></i><input value="{{ mQuery }}" onChange="{{ setMQuery }}" onKeyDown="{{ mKey }}" placeholder="Search name or village · नाम या गाँव" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#F8FAFC;font:inherit;letter-spacing:inherit;padding:0"></div>
         <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ mFilters }}" as="f" hint-placeholder-count="4"><span onClick="{{ f.pick }}" style="cursor:pointer;padding:7px 12px;border-radius:999px;background:{{ f.bg }};color:{{ f.ink }};font-size:13px;font-weight:{{ f.w }}">{{ f.t }}</span></sc-for></div>
-        <sc-for list="{{ motherRows }}" as="r" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;background:#111827"><span style="width:8px;height:40px;border-radius:9px;background:{{ r.col }};flex:none"></span><span style="flex:1;line-height:1.2;min-width:0"><b style="font-size:15px">{{ r.t }}</b><br><span style="font-size:12px;color:#94A3B8">{{ r.sub }}</span></span><span onClick="{{ r.visit }}" title="Home visit" style="cursor:pointer;width:36px;height:36px;border-radius:12px;background:#1F2937;display:grid;place-items:center;color:#5EEAD4"><i class="icon-clipboard-check"></i></span><span onClick="{{ r.refer }}" title="Referral" style="cursor:pointer;width:36px;height:36px;border-radius:12px;background:#1F2937;display:grid;place-items:center;color:#FDBA74"><i class="icon-file-output"></i></span><span onClick="{{ r.passport }}" title="Passport" style="cursor:pointer;width:36px;height:36px;border-radius:12px;background:#1F2937;display:grid;place-items:center;color:#94A3B8"><i class="icon-id-card"></i></span></div></sc-for>
+        <sc-for list="{{ motherRows }}" as="r" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;background:#111827"><span style="width:8px;height:40px;border-radius:9px;background:{{ r.col }};flex:none"></span><span class="jd-keep" style="flex:1;line-height:1.25;min-width:0"><b style="font-size:15px">{{ r.t }}</b> <span style="padding:1px 7px;border-radius:999px;background:{{ r.pBg }};color:{{ r.pInk }};font-size:11px;font-weight:800;white-space:nowrap">{{ r.pTag }}</span><br><span style="font-size:12px;color:#94A3B8">{{ r.sub }}</span><sc-if value="{{ r.why }}" hint-placeholder-val="{{ false }}"><br><span style="font-size:12px;color:{{ r.whyInk }}">{{ r.why }}</span></sc-if></span><span onClick="{{ r.visit }}" title="Home visit" style="cursor:pointer;width:36px;height:36px;border-radius:12px;background:#1F2937;display:grid;place-items:center;color:#5EEAD4"><i class="icon-clipboard-check"></i></span><span onClick="{{ r.refer }}" title="Referral" style="cursor:pointer;width:36px;height:36px;border-radius:12px;background:#1F2937;display:grid;place-items:center;color:#FDBA74"><i class="icon-file-output"></i></span><span onClick="{{ r.passport }}" title="Passport" style="cursor:pointer;width:36px;height:36px;border-radius:12px;background:#1F2937;display:grid;place-items:center;color:#94A3B8"><i class="icon-id-card"></i></span></div></sc-for>
         <sc-if value="{{ noMothers }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:#94A3B8;text-align:center;padding:12px">No mothers found. Tap + to register a mother. · कोई माँ नहीं मिली।</span></sc-if>
       </div>
     </sc-if>
@@ -279,10 +279,13 @@
     <sc-if value="{{ s_visit }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1;min-height:0;overflow-y:auto;padding:8px 18px 20px;display:flex;flex-direction:column;gap:12px;animation:jdIn .35s ease">
         <div style="display:flex;justify-content:space-between;align-items:center"><i onClick="{{ goBack }}" class="icon-arrow-left" style="cursor:pointer;font-size:22px"></i><b style="font-size:17px">{{ visitTitle }}</b><span style="font-size:13px;color:#94A3B8">{{ visitWeek }}</span></div>
+        <div onClick="{{ visitVoice }}" style="flex:none;cursor:pointer;padding:12px 14px;border-radius:18px;background:#0F766E;display:flex;gap:12px;align-items:center"><span style="width:46px;height:46px;flex:none;border-radius:50%;background:#F8FAFC;display:grid;place-items:center;font-size:22px;box-shadow:0 0 0 6px {{ vRing }}"><i class="{{ vMicIc }}"></i></span><span class="jd-keep" style="line-height:1.25"><b style="font-size:16px">{{ vSpeakTitle }}</b><br><span style="font-size:12px;color:#CCFBF1">{{ vSpeakSub }}</span></span></div>
+        <sc-if value="{{ vUnderstood }}" hint-placeholder-val="{{ false }}"><div class="jd-keep" style="flex:none;padding:10px 12px;border-radius:14px;background:rgba(20,184,166,.10);border:1px dashed rgba(20,184,166,.45);font-size:13px;line-height:1.45;color:#5EEAD4;display:flex;gap:8px"><i class="icon-sparkles" style="flex:none;margin-top:2px"></i><span>{{ vUnderstood }}</span></div></sc-if>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><span style="padding:12px;border-radius:16px;background:#111827;line-height:1.15"><span style="font-size:12px;color:#94A3B8">BP</span><br><input inputmode="numeric" value="{{ vBp }}" onChange="{{ setVBp }}" placeholder="118/76" style="width:100%;background:transparent;border:0;outline:0;color:#F8FAFC;font:700 19px 'Baloo 2';padding:0"></span><span style="padding:12px;border-radius:16px;background:#111827;line-height:1.15"><span style="font-size:12px;color:#94A3B8">Weight kg</span><br><input inputmode="decimal" value="{{ vWeight }}" onChange="{{ setVWeight }}" placeholder="58" style="width:100%;background:transparent;border:0;outline:0;color:#F8FAFC;font:700 19px 'Baloo 2';padding:0"></span><span style="padding:12px;border-radius:16px;background:#111827;line-height:1.15"><span style="font-size:12px;color:#94A3B8">Hb</span><br><input inputmode="decimal" value="{{ vHb }}" onChange="{{ setVHb }}" placeholder="9.8" style="width:100%;background:transparent;border:0;outline:0;color:#FACC15;font:700 19px 'Baloo 2';padding:0"></span></div>
         <b style="font-size:15px">Checklist · जाँच सूची</b>
         <sc-for list="{{ vChecks }}" as="c" hint-placeholder-count="4"><div onClick="{{ c.toggle }}" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:#111827"><span style="width:24px;height:24px;border-radius:8px;background:{{ c.box }};border:2px solid {{ c.boxBd }};color:#0B1020;display:grid;place-items:center;font-size:14px"><i class="{{ c.ic }}"></i></span><span style="font-size:15px">{{ c.t }}</span></div></sc-for>
         <div style="padding:12px 14px;border-radius:16px;background:#111827;display:flex;gap:10px;align-items:flex-start"><i onClick="{{ visitVoice }}" class="icon-mic" style="cursor:pointer;color:{{ vMicInk }};font-size:22px;margin-top:2px"></i><textarea value="{{ vNotes }}" onChange="{{ setVNotes }}" rows="3" placeholder="Notes, or tap the mic to record · नोट्स या आवाज़ में बोलें" style="flex:1;min-width:0;background:transparent;border:0;outline:0;color:#CBD5E1;font:inherit;font-size:14px;line-height:1.4;resize:none;padding:0"></textarea></div>
+        <span onClick="{{ readNotes }}" class="jd-keep" style="cursor:pointer;align-self:flex-start;padding:7px 12px;border-radius:12px;background:#1F2937;font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center"><i class="icon-wand-sparkles"></i>{{ readNotesT }}</span>
         <sc-if value="{{ vHasVoice }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#64748B">🎤 Voice note recorded · will be saved with the visit</span></sc-if>
         <div style="margin-top:auto;display:grid;grid-template-columns:1fr 1.4fr;gap:10px"><div onClick="{{ saveVisit }}" style="cursor:pointer;height:56px;border-radius:18px;background:#111827;color:#F8FAFC;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:18px">{{ visitSaveLabel }}</div><div onClick="{{ visitRefer }}" style="cursor:pointer;height:56px;border-radius:18px;background:#F97316;color:#1c0a00;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:18px">Refer · रेफ़र</div></div>
       </div>
@@ -302,6 +305,42 @@
       </div>
     </sc-if>
 
+    <sc-if value="{{ s_ashaReport }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;min-height:0;overflow-y:auto;padding:8px 18px 20px;display:flex;flex-direction:column;gap:12px;animation:jdIn .35s ease">
+        <div style="display:flex;justify-content:space-between;align-items:center"><i onClick="{{ goBack }}" class="icon-arrow-left" style="cursor:pointer;font-size:22px"></i><b style="font-size:17px">Monthly report · मासिक रिपोर्ट</b><span style="width:22px"></span></div>
+        <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:16px;background:#111827"><span onClick="{{ repPrev }}" style="cursor:pointer;width:40px;height:40px;border-radius:12px;background:#1F2937;display:grid;place-items:center"><i class="icon-chevron-left"></i></span><b class="jd-keep" style="font-size:16px">{{ repMonthLabel }}</b><span onClick="{{ repNext }}" style="cursor:pointer;width:40px;height:40px;border-radius:12px;background:#1F2937;display:grid;place-items:center;opacity:{{ repNextOp }}"><i class="icon-chevron-right"></i></span></div>
+        <div style="flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><sc-for list="{{ repTiles }}" as="t" hint-placeholder-count="6"><span class="jd-keep" style="padding:12px;border-radius:16px;background:#111827;line-height:1.15"><b style="font:800 24px 'Baloo 2';color:{{ t.col }}">{{ t.n }}</b><br><span style="font-size:12px;color:#94A3B8">{{ t.t }}</span></span></sc-for></div>
+        <div style="flex:none;padding:14px;border-radius:18px;background:#111827;display:flex;flex-direction:column;gap:8px">
+          <b style="font-size:15px">Incentives (estimate) · प्रोत्साहन राशि (अनुमान)</b>
+          <sc-for list="{{ repIncentives }}" as="i" hint-placeholder-count="2"><div class="jd-keep" style="display:flex;justify-content:space-between;gap:10px;font-size:14px"><span style="line-height:1.3">{{ i.t }}<br><span style="font-size:12px;color:#94A3B8">{{ i.sub }}</span></span><b style="white-space:nowrap">{{ i.amt }}</b></div></sc-for>
+          <div class="jd-keep" style="display:flex;justify-content:space-between;border-top:1px solid rgba(148,163,184,.15);padding-top:8px;font-size:15px"><b>Total</b><b style="color:#5EEAD4">{{ repTotal }}</b></div>
+          <span class="jd-keep" style="font-size:12px;color:#94A3B8;line-height:1.4">{{ repNote }}</span>
+        </div>
+        <div style="flex:none;padding:14px;border-radius:18px;background:#111827;display:flex;flex-direction:column;gap:8px">
+          <b style="font-size:15px">High-risk mothers · ज़्यादा जोखिम</b>
+          <sc-for list="{{ repHigh }}" as="m" hint-placeholder-count="1"><div class="jd-keep" style="display:flex;gap:10px;align-items:center"><span style="width:8px;height:32px;border-radius:9px;background:{{ m.col }}"></span><span style="line-height:1.25"><b style="font-size:14px">{{ m.t }}</b><br><span style="font-size:12px;color:#94A3B8">{{ m.sub }}</span></span></div></sc-for>
+          <sc-if value="{{ repNoHigh }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#94A3B8">None this month · इस महीने कोई नहीं</span></sc-if>
+        </div>
+        <div style="flex:none;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <span onClick="{{ repPrint }}" style="cursor:pointer;height:48px;border-radius:16px;background:#0F766E;display:flex;gap:8px;align-items:center;justify-content:center;font-weight:700"><i class="icon-printer"></i>Print / PDF</span>
+          <span onClick="{{ repCsv }}" style="cursor:pointer;height:48px;border-radius:16px;background:#1F2937;display:flex;gap:8px;align-items:center;justify-content:center;font-weight:700"><i class="icon-sheet"></i>Download CSV</span>
+        </div>
+        <span onClick="{{ repShare }}" class="jd-keep" style="flex:none;cursor:pointer;height:48px;border-radius:16px;border:1px solid rgba(20,184,166,.45);display:flex;gap:8px;align-items:center;justify-content:center;font-weight:700"><i class="icon-send"></i>{{ repShareT }}</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ s_ashaInbox }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;min-height:0;overflow-y:auto;padding:8px 18px 20px;display:flex;flex-direction:column;gap:10px;animation:jdIn .35s ease">
+        <div style="display:flex;justify-content:space-between;align-items:center"><i onClick="{{ goBack }}" class="icon-arrow-left" style="cursor:pointer;font-size:22px"></i><b style="font-size:17px">Messages · संदेश</b><span style="width:22px"></span></div>
+        <input value="{{ inboxQuery }}" onChange="{{ setInboxQuery }}" placeholder="Search a mother…" style="flex:none;height:46px;border-radius:16px;background:#111827;padding:0 14px;border:0;outline:0;color:#F8FAFC;font:inherit;font-size:15px">
+        <sc-for list="{{ inboxList }}" as="c" hint-placeholder-count="3"><div onClick="{{ c.open }}" style="flex:none;cursor:pointer;display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:16px;background:#111827">
+          <span class="jd-keep" style="width:40px;height:40px;flex:none;border-radius:50%;background:#0F766E;display:grid;place-items:center;font-weight:800">{{ c.initial }}</span>
+          <span class="jd-keep" style="flex:1;min-width:0;line-height:1.3"><b style="font-size:15px">{{ c.t }}</b><br><span style="font-size:13px;color:{{ c.ink }};display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.sub }}</span></span>
+          <sc-if value="{{ c.unread }}" hint-placeholder-val="{{ false }}"><span class="jd-keep" style="flex:none;min-width:24px;height:24px;padding:0 7px;border-radius:12px;background:#14B8A6;color:#0B1020;font-size:12px;font-weight:800;display:grid;place-items:center">{{ c.unread }}</span></sc-if>
+          <span class="jd-keep" style="flex:none;font-size:11px;color:#64748B">{{ c.when }}</span>
+        </div></sc-for>
+        <sc-if value="{{ inboxEmpty }}" hint-placeholder-val="{{ false }}"><span class="jd-keep" style="font-size:14px;color:#94A3B8;line-height:1.4">{{ inboxEmpty }}</span></sc-if>
+      </div>
+    </sc-if>
 <sc-if value="{{ s_home }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1;min-height:0;overflow-y:auto;padding:8px 18px 20px;display:flex;flex-direction:column;gap:14px;animation:jdIn .35s ease">
         <div style="display:flex;justify-content:space-between;align-items:center"><span style="line-height:1.15"><span style="color:#94A3B8;font-size:15px">{{ greeting }}</span><br><b style="font:800 26px 'Baloo 2'">{{ firstName }}</b></span><span style="display:flex;gap:8px"><span onClick="{{ goProfile }}" title="Profile" style="cursor:pointer;width:44px;height:44px;border-radius:14px;background:#111827;display:grid;place-items:center;font-size:20px"><i class="icon-user-round"></i></span><span onClick="{{ openMenu }}" style="cursor:pointer;width:44px;height:44px;border-radius:14px;background:#111827;display:grid;place-items:center;font-size:20px"><i class="icon-menu"></i></span></span></div>
@@ -323,20 +362,34 @@
           <div onClick="{{ goAssess }}" style="cursor:pointer;padding:16px;border-radius:20px;background:#111827;display:flex;flex-direction:column;gap:10px"><i class="icon-clipboard-check" style="font-size:24px;color:#5EEAD4"></i><span style="line-height:1.15"><b style="font-size:16px">Health check</b><br><span style="font-size:13px;color:#94A3B8">स्वास्थ्य जाँच</span></span></div>
           <div onClick="{{ goTalk }}" style="cursor:pointer;padding:16px;border-radius:20px;background:rgba(232,121,249,.10);border:1px solid rgba(232,121,249,.3);display:flex;flex-direction:column;gap:10px"><i class="icon-hand-heart" style="font-size:24px;color:#E879F9"></i><span style="line-height:1.15"><b style="font-size:16px">Talk To Me</b><br><span style="font-size:13px;color:#D8B4E2">मुझसे बात करें</span></span></div>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div onClick="{{ goNearby }}" style="cursor:pointer;padding:16px;border-radius:20px;background:#111827;display:flex;flex-direction:column;gap:10px"><i class="icon-map-pinned" style="font-size:24px;color:#EAB308"></i><span style="line-height:1.15"><b style="font-size:16px">Nearby Care</b><br><span style="font-size:13px;color:#94A3B8">Map · नक्शा, अस्पताल</span></span></div>
+          <div onClick="{{ goGuide }}" style="cursor:pointer;padding:16px;border-radius:20px;background:#111827;display:flex;flex-direction:column;gap:10px"><i class="icon-book-open-text" style="font-size:24px;color:#4ADE80"></i><span style="line-height:1.15"><b style="font-size:16px">Ask the Guide</b><br><span style="font-size:13px;color:#94A3B8">गर्भावस्था गाइड</span></span></div>
+        </div>
       </div>
     </sc-if>
 
     <sc-if value="{{ s_companion }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1;min-height:0;overflow-y:auto;padding:8px 18px 20px;display:flex;flex-direction:column;gap:14px;animation:jdIn .35s ease">
         <div style="line-height:1.1"><b style="font:800 26px 'Baloo 2'">Pregnancy Companion</b><br><span style="color:#94A3B8;font-size:15px">गर्भावस्था साथी</span></div>
-        <div onClick="{{ togglePlan }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;padding:16px;border-radius:22px;background:#0F766E"><span style="width:52px;height:52px;border-radius:50%;background:#F8FAFC;color:#0F766E;display:grid;place-items:center;font-size:24px;box-shadow:0 0 0 8px rgba(255,255,255,.12)"><i class="icon-mic"></i></span><span style="line-height:1.2"><b style="font-size:19px">Plan My Day</b><br><span style="font-size:14px;color:#CCFBF1">{{ planHint }}</span></span></div>
-        <sc-if value="{{ plan }}" hint-placeholder-val="{{ false }}">
-          <div style="padding:16px;border-radius:20px;background:#111827;display:flex;flex-direction:column;gap:10px;animation:jdPop .3s ease">
-            <b style="font-size:16px">Your day · आपका दिन</b>
-            <sc-for list="{{ planItems }}" as="p" hint-placeholder-count="4"><span style="font-size:15px;display:flex;gap:10px"><span style="color:#5EEAD4;width:72px;flex:none">{{ p.time }}</span>{{ p.t }}</span></sc-for>
-          Sleep on left side</span>
+        <div style="flex:none;display:flex;flex-direction:column;border-radius:22px;background:#111827;overflow:hidden">
+          <div onClick="{{ pdVoice }}" style="cursor:pointer;display:flex;align-items:center;gap:14px;padding:14px 16px;background:#0F766E"><span style="width:52px;height:52px;flex:none;border-radius:50%;background:#F8FAFC;display:grid;place-items:center;font-size:24px;box-shadow:0 0 0 8px {{ pdRing }}"><i class="{{ pdBigIc }}"></i></span><span style="line-height:1.2"><b style="font-size:19px">Plan My Day</b><br><span class="jd-keep" style="font-size:14px;color:#CCFBF1">{{ planHint }}</span></span></div>
+          <div id="jd-pd-chat" style="max-height:300px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ pdList }}" as="m" hint-placeholder-count="2"><div class="jd-keep" style="align-self:{{ m.align }};max-width:86%;padding:10px 13px;border-radius:{{ m.radius }};background:{{ m.bg }};font-size:15px;line-height:1.45;white-space:pre-line;animation:jdPop .25s ease">{{ m.t }}</div></sc-for>
+            <sc-if value="{{ pdTyping }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-start;padding:10px 14px;border-radius:18px;background:#1F2937;color:#94A3B8;font-size:14px">typing…</div></sc-if>
           </div>
-        </sc-if>
+          <sc-if value="{{ pdUnderstood }}" hint-placeholder-val="{{ false }}"><div style="margin:0 12px;padding:8px 12px;border-radius:12px;background:rgba(20,184,166,.10);border:1px dashed rgba(20,184,166,.45);font-size:13px;color:#5EEAD4;display:flex;gap:8px;align-items:flex-start"><i class="icon-sparkles" style="flex:none;margin-top:2px"></i><span class="jd-keep">{{ pdUnderstood }}</span></div></sc-if>
+          <div style="padding:10px 12px 0;display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ pdQuick }}" as="q" hint-placeholder-count="3"><span class="jd-keep" onClick="{{ q.send }}" style="cursor:pointer;padding:8px 12px;border-radius:14px;background:#0B1020;border:1px solid rgba(20,184,166,.35);font-size:13px">{{ q.t }}</span></sc-for></div>
+          <div style="padding:10px 12px 12px;display:flex;gap:8px;align-items:center"><input value="{{ pdInput }}" onChange="{{ setPdInput }}" onKeyDown="{{ pdKey }}" placeholder="Tell me about your day…" style="flex:1;min-width:0;height:46px;border-radius:16px;background:#0B1020;padding:0 14px;border:0;outline:0;color:#F8FAFC;font:inherit;font-size:15px"><span onClick="{{ pdSendIt }}" title="Send" style="cursor:pointer;width:46px;height:46px;flex:none;border-radius:16px;background:#1F2937;display:grid;place-items:center;font-size:18px;color:#5EEAD4"><i class="icon-send"></i></span><span onClick="{{ pdVoice }}" title="Speak" style="cursor:pointer;width:50px;height:50px;flex:none;border-radius:50%;background:{{ pdMicBg }};color:#0B1020;display:grid;place-items:center;font-size:22px"><i class="icon-mic"></i></span></div>
+        </div>
+        <div style="flex:none;padding:16px;border-radius:20px;background:#111827;display:flex;flex-direction:column;gap:10px;animation:jdPop .3s ease">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="line-height:1.15"><b style="font-size:16px">Your day · आपका दिन</b><br><span class="jd-keep" style="font-size:12px;color:#94A3B8">{{ planTitle }}</span></span><span onClick="{{ openAdd }}" style="cursor:pointer;flex:none;padding:8px 12px;border-radius:12px;background:#0F766E;font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center"><i class="icon-plus"></i>Add</span></div>
+          <sc-if value="{{ pdAdding }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-radius:14px;background:#0B1020"><input type="time" value="{{ naTime }}" onChange="{{ setNaTime }}" style="height:42px;border-radius:12px;background:#111827;border:0;outline:0;color:#F8FAFC;font:inherit;padding:0 10px;color-scheme:{{ colorScheme }}"><input value="{{ naTitle }}" onChange="{{ setNaTitle }}" placeholder="What? e.g. Temple, rest, call Maa" style="flex:1;min-width:140px;height:42px;border-radius:12px;background:#111827;border:0;outline:0;color:#F8FAFC;font:inherit;padding:0 12px"><span onClick="{{ addTask }}" style="cursor:pointer;height:42px;padding:0 16px;border-radius:12px;background:#14B8A6;color:#0B1020;font-weight:700;display:grid;place-items:center">Add to my day</span></div></sc-if>
+          <sc-for list="{{ planItems }}" as="p" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;gap:6px;padding:6px 0;border-bottom:1px solid rgba(148,163,184,.08)">
+            <div style="display:flex;gap:10px;align-items:center"><span onClick="{{ p.toggle }}" title="Done" style="cursor:pointer;width:24px;height:24px;flex:none;border-radius:50%;background:{{ p.ck }};border:{{ p.ckBd }};display:grid;place-items:center;font-size:13px;color:#052e16"><i class="{{ p.ckIc }}"></i></span><span class="jd-keep" style="color:#5EEAD4;width:68px;flex:none;font-size:14px">{{ p.time }}</span><span class="jd-keep" onClick="{{ p.edit }}" style="cursor:pointer;flex:1;font-size:15px;line-height:1.3;opacity:{{ p.op }};text-decoration:{{ p.deco }}">{{ p.t }}<sc-if value="{{ p.sub }}" hint-placeholder-val="{{ false }}"><br><span style="font-size:12px;color:#94A3B8">{{ p.sub }}</span></sc-if></span><i onClick="{{ p.edit }}" title="Change" class="icon-pencil" style="cursor:pointer;flex:none;font-size:15px;color:#64748B"></i></div>
+            <sc-if value="{{ p.editing }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;flex-wrap:wrap;padding:10px;border-radius:14px;background:#0B1020"><input type="time" value="{{ peTime }}" onChange="{{ setPeTime }}" style="height:40px;border-radius:12px;background:#111827;border:0;outline:0;color:#F8FAFC;font:inherit;padding:0 10px;color-scheme:{{ colorScheme }}"><sc-if value="{{ p.canRename }}" hint-placeholder-val="{{ false }}"><input value="{{ peTitle }}" onChange="{{ setPeTitle }}" style="flex:1;min-width:120px;height:40px;border-radius:12px;background:#111827;border:0;outline:0;color:#F8FAFC;font:inherit;padding:0 12px"></sc-if><span onClick="{{ p.save }}" style="cursor:pointer;height:40px;padding:0 14px;border-radius:12px;background:#14B8A6;color:#0B1020;font-weight:700;display:grid;place-items:center">Save</span><sc-if value="{{ p.canDelete }}" hint-placeholder-val="{{ false }}"><span onClick="{{ p.remove }}" style="cursor:pointer;height:40px;padding:0 14px;border-radius:12px;background:rgba(220,38,38,.15);color:#FCA5A5;font-weight:700;display:grid;place-items:center">Remove</span></sc-if><span onClick="{{ p.cancel }}" style="cursor:pointer;height:40px;padding:0 12px;border-radius:12px;color:#94A3B8;display:grid;place-items:center">Cancel</span></div></sc-if>
+          </div></sc-for>
+        </div>
         <div style="padding:16px;border-radius:20px;background:#111827;display:flex;flex-direction:column;gap:12px">
           <div style="display:flex;justify-content:space-between;align-items:center"><span style="line-height:1.15"><b style="font-size:16px">Hydration · पानी</b><br><span style="font-size:13px;color:#94A3B8">{{ water }} of {{ waterGoal }} glasses</span></span><span onClick="{{ addWater }}" style="cursor:pointer;width:48px;height:48px;border-radius:16px;background:#14B8A6;color:#0B1020;display:grid;place-items:center;font-size:22px"><i class="icon-plus"></i></span></div>
           <div style="display:flex;gap:6px"><sc-for list="{{ glasses }}" as="g" hint-placeholder-count="8"><span style="flex:1;height:30px;border-radius:6px 6px 10px 10px;background:{{ g.bg }};transition:background .3s"></span></sc-for></div>
@@ -390,7 +443,7 @@
 
     <sc-if value="{{ s_ashaChat }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1;min-height:0;display:flex;flex-direction:column;animation:jdIn .35s ease">
-        <div style="flex:none;padding:6px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(148,163,184,.12)"><i onClick="{{ goAsha }}" class="icon-arrow-left" style="cursor:pointer;font-size:22px"></i><image-slot id="proto-asha-chat" shape="circle" src="illustrations/asha-avatar.svg" style="width:42px;height:42px;flex:none"></image-slot><span style="flex:1;line-height:1.15"><b style="font-size:16px">{{ ashaName }}</b> <i class="icon-badge-check" style="color:#22C55E;font-size:14px"></i><br><span style="font-size:12px;color:#94A3B8">{{ cPresence }}</span></span><span onClick="{{ secureCall }}" style="cursor:pointer;width:42px;height:42px;border-radius:14px;background:#0F766E;display:grid;place-items:center;font-size:20px"><i class="icon-phone"></i></span></div>
+        <div style="flex:none;padding:6px 16px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(148,163,184,.12)"><i onClick="{{ goAsha }}" class="icon-arrow-left" style="cursor:pointer;font-size:22px"></i><image-slot id="proto-asha-chat" shape="circle" src="illustrations/asha-avatar.svg" style="width:42px;height:42px;flex:none"></image-slot><span style="flex:1;line-height:1.15"><b style="font-size:16px">{{ chatName }}</b> <i class="icon-badge-check" style="color:#22C55E;font-size:14px"></i><br><span style="font-size:12px;color:#94A3B8">{{ cPresence }}</span></span><span onClick="{{ secureCall }}" style="cursor:pointer;width:42px;height:42px;border-radius:14px;background:#0F766E;display:grid;place-items:center;font-size:20px"><i class="icon-phone"></i></span></div>
         <div style="flex:1;min-height:0;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
           <sc-for list="{{ cList }}" as="m" hint-placeholder-count="1"><div style="align-self:{{ m.align }};max-width:80%;padding:12px 14px;border-radius:{{ m.radius }};background:{{ m.bg }};font-size:15px;line-height:1.4;animation:jdPop .25s ease">{{ m.t }}</div></sc-for>
         </div>
@@ -475,7 +528,16 @@
         <div style="line-height:1.1"><b style="font:800 26px 'Baloo 2'">Pregnancy Guide</b><br><span style="color:#94A3B8;font-size:15px">गर्भावस्था गाइड</span></div>
         <div style="display:flex;gap:6px;justify-content:center"><sc-for list="{{ weeks }}" as="w" hint-placeholder-count="5"><span onClick="{{ w.pick }}" style="cursor:pointer;width:52px;height:52px;border-radius:14px;background:{{ w.bg }};border:2px solid {{ w.bd }};color:{{ w.ink }};display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1"><span style="font-size:10px">wk</span><b style="font:700 18px 'Baloo 2'">{{ w.n }}</b></span></sc-for></div>
         <div style="padding:16px;border-radius:22px;background:#0F766E;display:flex;gap:14px;align-items:center"><image-slot id="proto-guide-baby" shape="rounded" radius="16" src="illustrations/baby-week24.svg" style="width:60px;height:60px;flex:none"></image-slot><span style="line-height:1.35"><span style="font-size:12px;color:#CCFBF1;font-weight:700;letter-spacing:.08em">MILESTONE · WEEK {{ week }}</span><br><span style="font-size:15px">{{ weekText }}</span></span></div>
-        <div style="display:flex;gap:12px;padding:14px;border-radius:18px;background:#111827"><span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(34,197,94,.14);color:#4ADE80;display:grid;place-items:center;font-size:20px"><i class="icon-apple"></i></span><span style="line-height:1.3"><b>Nutrition</b> <span style="font-size:13px;color:#94A3B8">पोषण</span><br><span style="font-size:14px;color:#CBD5E1">{{ gNutrition }}</span></span></div>
+        <div style="flex:none;display:flex;flex-direction:column;border-radius:22px;background:#111827;overflow:hidden;border:1px solid rgba(20,184,166,.25)">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(20,184,166,.10)"><span style="width:40px;height:40px;flex:none;border-radius:14px;background:#0F766E;display:grid;place-items:center;font-size:20px"><i class="icon-message-circle-question"></i></span><span style="line-height:1.2"><b class="jd-keep" style="font-size:16px">{{ gAskTitle }}</b><br><span style="font-size:12px;color:#94A3B8">Pregnancy, birth and baby care only · सिर्फ़ गर्भावस्था और शिशु देखभाल</span></span></div>
+          <div id="jd-g-chat" style="max-height:320px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ gList }}" as="m" hint-placeholder-count="1"><div class="jd-keep" style="align-self:{{ m.align }};max-width:88%;padding:10px 13px;border-radius:{{ m.radius }};background:{{ m.bg }};font-size:15px;line-height:1.45;white-space:pre-line;animation:jdPop .25s ease">{{ m.t }}</div></sc-for>
+            <sc-if value="{{ gTyping }}" hint-placeholder-val="{{ false }}"><div style="align-self:flex-start;padding:10px 14px;border-radius:18px;background:#1F2937;color:#94A3B8;font-size:14px">typing…</div></sc-if>
+          </div>
+          <div style="padding:0 12px;display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ gQuick }}" as="q" hint-placeholder-count="3"><span class="jd-keep" onClick="{{ q.send }}" style="cursor:pointer;padding:8px 12px;border-radius:14px;background:#0B1020;border:1px solid rgba(20,184,166,.35);font-size:13px">{{ q.t }}</span></sc-for></div>
+          <div style="padding:10px 12px 12px;display:flex;gap:8px;align-items:center"><input value="{{ gInput }}" onChange="{{ setGInput }}" onKeyDown="{{ gKey }}" placeholder="Ask your question…" style="flex:1;min-width:0;height:46px;border-radius:16px;background:#0B1020;padding:0 14px;border:0;outline:0;color:#F8FAFC;font:inherit;font-size:15px"><span onClick="{{ gSendIt }}" title="Send" style="cursor:pointer;width:46px;height:46px;flex:none;border-radius:16px;background:#1F2937;display:grid;place-items:center;font-size:18px;color:#5EEAD4"><i class="icon-send"></i></span><span onClick="{{ gVoice }}" title="Speak" style="cursor:pointer;width:50px;height:50px;flex:none;border-radius:50%;background:{{ gMicBg }};color:#0B1020;display:grid;place-items:center;font-size:22px"><i class="icon-mic"></i></span></div>
+        </div>
+<div style="display:flex;gap:12px;padding:14px;border-radius:18px;background:#111827"><span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(34,197,94,.14);color:#4ADE80;display:grid;place-items:center;font-size:20px"><i class="icon-apple"></i></span><span style="line-height:1.3"><b>Nutrition</b> <span style="font-size:13px;color:#94A3B8">पोषण</span><br><span style="font-size:14px;color:#CBD5E1">{{ gNutrition }}</span></span></div>
         <div style="display:flex;gap:12px;padding:14px;border-radius:18px;background:#111827"><span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(20,184,166,.14);color:#5EEAD4;display:grid;place-items:center;font-size:20px"><i class="icon-calendar-check"></i></span><span style="line-height:1.3"><b>ANC Schedule</b> <span style="font-size:13px;color:#94A3B8">जाँच</span><br><span style="font-size:14px;color:#CBD5E1">{{ gAnc }}</span></span></div>
         <div style="display:flex;gap:12px;padding:14px;border-radius:18px;background:#111827"><span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(244,114,182,.14);color:#F472B6;display:grid;place-items:center;font-size:20px"><i class="icon-landmark"></i></span><span style="line-height:1.3"><b>Government Schemes</b> <span style="font-size:13px;color:#94A3B8">योजनाएँ</span><br><span style="font-size:14px;color:#CBD5E1">{{ gSchemes }}</span></span></div>
       </div>
@@ -507,9 +569,33 @@
           <span style="padding:12px;border-radius:18px;background:#111827;line-height:1.1"><b style="font:800 26px 'Baloo 2';color:#FACC15">{{ dAnc }}</b><br><span style="font-size:12px;color:#94A3B8">ANC due</span></span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><span onClick="{{ goRegister }}" style="cursor:pointer;height:52px;border-radius:16px;background:#0F766E;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700"><i class="icon-user-plus"></i>Register Mother</span><span onClick="{{ goMothers }}" style="cursor:pointer;height:52px;border-radius:16px;background:#111827;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700"><i class="icon-users"></i>My Mothers</span></div>
-        <b style="font:700 17px 'Baloo 2'">Today's visits</b>
-        <sc-for list="{{ visitList }}" as="r" hint-placeholder-count="2"><div onClick="{{ r.open }}" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px;border-radius:16px;background:#111827"><span style="width:8px;height:36px;border-radius:9px;background:{{ r.col }}"></span><span style="flex:1;line-height:1.2"><b style="font-size:15px">{{ r.t }}</b><br><span style="font-size:12px;color:#94A3B8">{{ r.sub }}</span></span><i class="icon-navigation" style="color:#5EEAD4"></i></div></sc-for>
-        <sc-if value="{{ noVisits }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:#94A3B8">No visits due today.</span></sc-if>
+        <sc-for list="{{ alertList }}" as="a" hint-placeholder-count="0"><div style="flex:none;display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:16px;background:{{ a.bg }};border:1px solid {{ a.bd }}"><i class="{{ a.ic }}" style="font-size:18px;margin-top:2px;color:{{ a.ink }}"></i><span class="jd-keep" style="flex:1;line-height:1.3"><b style="font-size:14px">{{ a.t }}</b><br><span style="font-size:12px;color:#CBD5E1">{{ a.b }}</span></span><i onClick="{{ a.dismiss }}" class="icon-x" style="cursor:pointer;color:#94A3B8;font-size:18px"></i></div></sc-for>
+        <div style="flex:none;display:grid;grid-template-columns:1fr 1fr;gap:8px"><span onClick="{{ goInbox }}" style="cursor:pointer;height:48px;border-radius:16px;background:#111827;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700"><i class="icon-message-circle"></i>Messages<sc-if value="{{ dUnread }}" hint-placeholder-val="{{ false }}"><span class="jd-keep" style="min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#14B8A6;color:#0B1020;font-size:12px;font-weight:800;display:grid;place-items:center">{{ dUnread }}</span></sc-if></span><span onClick="{{ goReport }}" style="cursor:pointer;height:48px;border-radius:16px;background:#111827;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700"><i class="icon-chart-column"></i>Monthly report</span></div>
+<div style="flex:none;border-radius:20px;background:#111827;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 14px"><i class="icon-map-pinned" style="color:#5EEAD4;font-size:20px;flex:none"></i><span class="jd-keep" style="flex:1;line-height:1.25"><b style="font-size:15px">{{ areaTitle }}</b><br><span style="font-size:12px;color:#94A3B8">{{ areaSub }}</span></span><span class="jd-keep" onClick="{{ setMyArea }}" style="cursor:pointer;flex:none;padding:8px 12px;border-radius:12px;background:{{ areaBtnBg }};font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center"><i class="icon-locate-fixed"></i>{{ areaBtn }}</span></div>
+          <sc-if value="{{ areaHasMap }}" hint-placeholder-val="{{ false }}"><div id="jd-asha-map" class="jd-keep" style="height:240px;background:#0B1020;z-index:0"></div></sc-if>
+          <sc-if value="{{ pinSel }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px">
+            <div style="display:flex;gap:10px;align-items:center"><span style="width:8px;height:36px;flex:none;border-radius:9px;background:{{ pin.col }}"></span><span class="jd-keep" style="flex:1;line-height:1.25"><b style="font-size:15px">{{ pin.t }}</b><br><span style="font-size:12px;color:#94A3B8">{{ pin.sub }}</span></span></div>
+            <sc-if value="{{ pin.note }}" hint-placeholder-val="{{ false }}"><span class="jd-keep" style="font-size:13px;color:#5EEAD4">{{ pin.note }}</span></sc-if>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><span onClick="{{ pin.route }}" style="cursor:pointer;height:40px;border-radius:12px;background:#0F766E;display:flex;gap:6px;align-items:center;justify-content:center;font-size:13px;font-weight:700"><i class="icon-route"></i>Route</span><span onClick="{{ pin.dir }}" style="cursor:pointer;height:40px;border-radius:12px;background:#1F2937;display:flex;gap:6px;align-items:center;justify-content:center;font-size:13px;font-weight:700"><i class="icon-navigation"></i>Directions</span><span onClick="{{ pin.open }}" style="cursor:pointer;height:40px;border-radius:12px;background:#1F2937;display:flex;gap:6px;align-items:center;justify-content:center;font-size:13px;font-weight:700"><i class="icon-clipboard-pen"></i>Visit</span></div>
+          </div></sc-if>
+        </div>
+<div style="flex:none;display:flex;justify-content:space-between;align-items:flex-end;gap:10px"><span style="line-height:1.2"><b style="font:700 17px 'Baloo 2'">Today's work list</b><br><span class="jd-keep" style="font-size:12px;color:#94A3B8">{{ wlSummary }}</span></span><sc-if value="{{ wlCanRoute }}" hint-placeholder-val="{{ false }}"><span class="jd-keep" onClick="{{ wlToggleRoute }}" style="cursor:pointer;flex:none;padding:8px 12px;border-radius:12px;background:{{ wlRouteBg }};font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center"><i class="icon-route"></i>{{ wlRouteBtn }}</span></sc-if></div>
+        <sc-for list="{{ wlItems }}" as="w" hint-placeholder-count="2"><div style="flex:none;display:flex;gap:10px;padding:12px;border-radius:16px;background:#111827;opacity:{{ w.op }}">
+          <span class="jd-keep" style="width:30px;height:30px;flex:none;border-radius:50%;background:{{ w.col }};color:#0B1020;display:grid;place-items:center;font-weight:800;font-size:14px">{{ w.n }}</span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">
+            <span class="jd-keep" onClick="{{ w.visit }}" style="cursor:pointer;line-height:1.25"><b style="font-size:15px;text-decoration:{{ w.deco }}">{{ w.t }}</b> <span style="padding:1px 7px;border-radius:999px;background:{{ w.pBg }};color:{{ w.pInk }};font-size:11px;font-weight:800;white-space:nowrap">{{ w.pTag }}</span><br><span style="font-size:12px;color:#94A3B8">{{ w.sub }}</span></span>
+            <span class="jd-keep" style="font-size:12px;line-height:1.4;color:#94A3B8">{{ w.why }}</span>
+            <span class="jd-keep" style="font-size:13px;line-height:1.45;white-space:pre-line;color:{{ w.ink }}">{{ w.tasks }}</span>
+            <span style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+              <span onClick="{{ w.visit }}" style="cursor:pointer;height:36px;border-radius:10px;background:#0F766E;display:flex;gap:4px;align-items:center;justify-content:center;font-size:12px;font-weight:700"><i class="icon-clipboard-pen"></i>Visit</span>
+              <span onClick="{{ w.remind }}" style="cursor:pointer;height:36px;border-radius:10px;background:#1F2937;display:flex;gap:4px;align-items:center;justify-content:center;font-size:12px;font-weight:700"><i class="icon-bell-ring"></i>Remind</span>
+              <span onClick="{{ w.dir }}" style="cursor:pointer;height:36px;border-radius:10px;background:#1F2937;display:flex;gap:4px;align-items:center;justify-content:center;font-size:12px;font-weight:700"><i class="icon-navigation"></i>Go</span>
+              <span class="jd-keep" onClick="{{ w.done }}" style="cursor:pointer;height:36px;border-radius:10px;background:{{ w.doneBg }};display:flex;gap:4px;align-items:center;justify-content:center;font-size:12px;font-weight:700"><i class="icon-check"></i>{{ w.doneT }}</span>
+            </span>
+          </span>
+        </div></sc-for>
+        <sc-if value="{{ wlEmpty }}" hint-placeholder-val="{{ false }}"><span class="jd-keep" style="font-size:14px;color:#94A3B8">{{ wlEmpty }}</span></sc-if>
       </div>
     </sc-if>
 
@@ -564,8 +650,8 @@
 // Language (हिंदी / English) and theme (dark / light) come from window.JDUI, see janamdatri-ui.js.
 const API = window.JD;
 const UI = window.JDUI || { lang: 'en', theme: 'dark', pick: (en) => en, setLang() {}, setTheme() {}, onChange() {} };
-const MOTHER_SCREENS = ['home', 'companion', 'talk', 'asha', 'ashaChat', 'assess', 'result', 'profile', 'reports', 'history', 'passportDone'];
-const ASHA_SCREENS = ['ashaDash', 'ashaMothers', 'register', 'visit', 'refer'];
+const MOTHER_SCREENS = ['home', 'companion', 'talk', 'asha', 'assess', 'result', 'profile', 'reports', 'history', 'passportDone'];
+const ASHA_SCREENS = ['ashaDash', 'ashaMothers', 'register', 'visit', 'refer', 'ashaReport', 'ashaInbox'];
 const SYM = [['Dizziness', 'चक्कर आना', 'dizziness'], ['Swelling in feet', 'पैरों में सूजन', 'swelling_feet'], ['Headache', 'सिरदर्द', 'headache'], ['Blurred vision', 'धुंधला दिखना', 'blurred_vision'], ['Tiredness', 'थकान', 'tiredness']];
 const CONDITIONS = [['diabetes', 'Diabetes', 'शुगर'], ['anemia', 'Anemia', 'खून की कमी'], ['hypertension', 'Hypertension', 'हाई BP'], ['thyroid', 'Thyroid', 'थायराइड']];
 const REPORT_SLOTS = [['cbc', 'icon-test-tube', 'CBC', 'खून की जाँच'], ['prescription', 'icon-file-text', 'Prescription', 'पर्ची'], ['ultrasound', 'icon-scan', 'Ultrasound', 'अल्ट्रासाउंड'], ['lab', 'icon-clipboard-list', 'Lab Reports', 'अन्य रिपोर्ट']];
@@ -582,6 +668,10 @@ const LV = {
   imm: { col: '#DC2626', bg: 'rgba(220,38,38,.16)', ink: '#FECACA' }
 };
 const GOAL_STYLE = { 'goal-iron': ['icon-pill', '#F472B6'], 'goal-hydration': ['icon-droplet', '#5EEAD4'], 'goal-nutrition': ['icon-apple', '#4ADE80'], 'goal-walk': ['icon-footprints', '#FACC15'], 'goal-sleep': ['icon-moon', '#E879F9'] };
+// Priority engine bands (score 0–100, rules only; see backend app/asha/priority.py)
+const PBAND = { critical: ['#DC2626', '#FFFFFF', 'Critical', 'गंभीर'], high: ['#F97316', '#0B1020', 'High', 'ज़्यादा'], medium: ['#FACC15', '#0B1020', 'Medium', 'मध्यम'], routine: ['#1F2937', '#94A3B8', 'Routine', 'सामान्य'] };
+const pTag = r => { const b = PBAND[r.priority_band] || PBAND.routine; return { pBg: b[0], pInk: b[1], pTag: `${T(b[2], b[3])} · ${r.priority_score}` }; };
+const whyLine = (r, n) => (r.priority_reasons || []).slice(0, n || 3).map(x => `+${x.points} ${T(x.text, x.text_hi)}`).join(' · ');
 const FAC_COL = { SC: '#14B8A6', PHC: '#22C55E', CHC: '#F97316', DH: '#DC2626', HOSP: '#EF4444', CLINIC: '#60A5FA' };
 const TRK = [['Location found', 'जगह मिली'], ['Nearest facility found', 'नज़दीकी अस्पताल मिला'], ['Assigned ASHA notified', 'आशा दीदी को सूचना दी'], ['Connecting support…', 'मदद जोड़ी जा रही है…'], ['Backup ASHA identified', 'दूसरी आशा तैयार']];
 const SCHEME_SHORT = { 'sc-pmmvy': 'PMMVY ₹5,000', 'sc-jsy': 'JSY', 'sc-jssk': 'JSSK free delivery', 'sc-pmsma': 'PMSMA free check-up on the 9th' };
@@ -603,6 +693,13 @@ const LOCATION_HELP = {
     'यह ब्राउज़र लोकेशन नहीं दे सकता। पिनकोड या गाँव लिखें।']
 };
 const locHelp = code => { const m = LOCATION_HELP[code] || LOCATION_HELP.unavailable; return UI.lang === 'hi' ? m[1] : m[0]; };
+// The SMS inbox (Mailpit) runs on the demo computer: only link to it there, not on a phone using the shared link.
+const onDemoComputer = () => typeof location === 'undefined' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const inboxFor = url => (!url || (!onDemoComputer() && /localhost|127\.0\.0\.1/.test(url))) ? '' : url;
+const otpSentToast = r => r.delivered_to
+  ? (inboxFor(r.delivered_to) ? T('OTP sent · read it in the SMS inbox (Mailpit)', 'ओटीपी भेजा गया · SMS इनबॉक्स (Mailpit) में देखें')
+    : T('OTP sent · it is in the SMS inbox on the computer running the app', 'ओटीपी भेजा गया · ऐप चलाने वाले कंप्यूटर के SMS इनबॉक्स में देखें'))
+  : T('OTP sent to ', 'ओटीपी भेजा गया: ') + r.phone_masked;
 const placeLine = g => [g.village, g.district, g.state].filter((x, i, a) => x && a.indexOf(x) === i).join(', ');
 
 const fmtTime = t => { if (!t) return ''; const [h, m] = t.split(':').map(Number); const hh = ((h + 11) % 12) + 1; return `${hh}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`; };
@@ -640,6 +737,12 @@ class Component extends DCLogic {
     me: null, prof: null, today: null, guideCache: {}, ashaInfo: null, hbLatest: null, facilities: [], fac: 0, dash: null, lastResult: null,
     // chats
     aMsgs: [], aInput: '', aTyping: false, aThread: null, aRec: false, speaking: false,
+    pdMsgs: [], pdInput: '', pdTyping: false, pdRec: false, pdQuick: [], pdUnderstood: '', pdStage: 'asking',
+    editTask: null, peTime: '', peTitle: '', pdAdding: false, naTime: '', naTitle: '',
+    gMsgs: [], gInput: '', gTyping: false, gRec: false, gSugg: [],
+    ashaMap: null, pinSel: -1, areaBusy: false, pinRoute: '', work: null, wlRoute: false,
+    vFields: null, vUnderstood: '', vReading: false, report: null, repMonth: '', alerts: [],
+    chatMother: null, inbox: null, inboxQuery: '', cNoAsha: '',
     tMsgs: [], tInput: '', tTyping: false, tSession: null, mood: -1,
     cMsgs: [], cInput: '', cPresence: 'active now', cRec: false, tRec: false, inboxUrl: '',
     threads: [], hQuery: '',
@@ -658,10 +761,13 @@ class Component extends DCLogic {
   };
 
   componentDidMount() {
+    this.onExpired = () => this.sessionExpired();
+    window.addEventListener('jd-session-expired', this.onExpired);
+    if (API.session) this.setState({ lastRole: API.role, lastPhone: digits((API.session.user || {}).phone || '') });
     this.onHash = () => this.routeHash();
     window.addEventListener('hashchange', this.onHash);
     UI.onChange(s => {
-      this.setState({ lang: s.lang, theme: s.theme, pLang: s.lang });
+      this.setState({ lang: s.lang, theme: s.theme, pLang: s.lang }, () => { this.renderMap(); this.renderAshaMap(true); });
       if (API.role === 'mother' && this.lastLang !== s.lang) { this.lastLang = s.lang; API.patch('/users/me', { language: s.lang }).catch(() => {}); }
     });
     this.lastLang = UI.lang;
@@ -670,6 +776,7 @@ class Component extends DCLogic {
   }
   componentWillUnmount() {
     window.removeEventListener('hashchange', this.onHash);
+    window.removeEventListener('jd-session-expired', this.onExpired);
     clearTimeout(this.toastT); clearInterval(this.poll); clearInterval(this.tick);
   }
 
@@ -707,6 +814,7 @@ class Component extends DCLogic {
   go(s) {
     const role = API.role;
     if (s === 'home' && role === 'asha') s = 'ashaDash';
+    if (s === 'asha' && role === 'asha') s = 'ashaInbox';  // back from a chat: her inbox
     if (s === 'home' && role === 'guest') s = 'guest';
     if (s === 'passport' && role === 'asha' && !this.state.pMotherId) s = 'ashaMothers';
     if ((MOTHER_SCREENS.includes(s) || (s === 'passport' && role !== 'asha')) && role !== 'mother') {
@@ -714,6 +822,9 @@ class Component extends DCLogic {
       else { if (role === 'guest') this.showToast(T('Create a free Health Passport to use this', 'इसके लिए मुफ़्त हेल्थ पासपोर्ट बनाएँ')); this.setState({ authMode: 'signup', roleSel: 'mother' }); s = 'login'; }
     }
     if (ASHA_SCREENS.includes(s) && role !== 'asha') s = 'ashaLogin';
+    if (s === 'ashaChat' && role !== 'mother' && role !== 'asha') { this.setState({ authMode: 'login', roleSel: 'mother' }); s = 'login'; }
+    if (s === 'ashaChat' && role === 'mother' && !this.state.me) s = 'passport';
+    if (s === 'ashaChat' && role === 'asha' && !this.state.chatMother) s = 'ashaInbox';
     if (MOTHER_SCREENS.includes(s) && s !== 'passportDone' && role === 'mother' && !this.state.me) s = 'passport';
     clearInterval(this.poll);
     this.stopSpeaking();
@@ -721,9 +832,12 @@ class Component extends DCLogic {
     if (s === 'emergency') this.enterEmergency();
     if (s === 'assess') this.setState({ step: 1 });
     if (s === 'nearby') { this.mapFitted = false; this.loadNearby(); }
-    if (s === 'guide') this.loadGuide(this.state.week);
+    if (s === 'guide') { this.loadGuide(this.state.week); if (!this.state.gMsgs.length) this.greetGuide(); }
+    if (s === 'companion') this.loadPlanChat();
     if (s === 'ashaChat') { this.loadChat(); this.poll = setInterval(() => this.loadChat(true), 6000); }
-    if (s === 'ashaDash') { this.loadDash(); this.poll = setInterval(() => this.loadDash(), 15000); }
+    if (s === 'ashaInbox') { this.loadInbox(); this.poll = setInterval(() => this.loadInbox(), 10000); }
+    if (s === 'ashaDash') { this.loadDash(); this.loadAshaMap(); this.loadWorklist(); this.loadAlerts(); this.poll = setInterval(() => { this.loadDash(); this.loadAlerts(); }, 15000); }
+    if (s === 'ashaReport') this.loadReport(this.state.repMonth);
     if (s === 'ashaMothers') this.loadMothers();
     if (s === 'result' && !this.state.lastResult) this.loadLatestResult();
     if (s === 'asha' && role === 'mother') this.loadAsha();
@@ -744,7 +858,24 @@ class Component extends DCLogic {
   }
 
   showToast(t, ms) { this.setState({ toast: t }); clearTimeout(this.toastT); this.toastT = setTimeout(() => this.setState({ toast: '' }), ms || 2800); }
-  fail(e) { this.setState({ busy: false }); this.showToast(e && e.message ? e.message : T('Something went wrong', 'कुछ गड़बड़ हुई')); }
+  fail(e) {
+    this.setState({ busy: false });
+    if (e && e.status === 401 && !API.session) return this.sessionExpired();
+    this.showToast(e && e.message ? e.message : T('Something went wrong', 'कुछ गड़बड़ हुई'));
+  }
+  // Login lost (expired, or signed out in another tab): say so, keep what she typed, and open login.
+  sessionExpired() {
+    const st = this.state;
+    if (['login', 'ashaLogin', 'role', 'landing'].includes(st.screen)) return;
+    const role = st.lastRole || (st.dash ? 'asha' : 'mother');
+    const known = [digits(st.phone || '').slice(-10), (st.lastPhone || '').slice(-10)].find(x => PHONE_RE.test(x));
+    clearInterval(this.poll);
+    this.showToast(T('Your login has expired. Please log in again; what you typed is kept.',
+      'आपका लॉग इन खत्म हो गया। फिर से लॉग इन करें; आपका भरा हुआ सेव है।'), 6000);
+    this.setState({ busy: false, keepForm: st.screen === 'passport', resumeStep: st.pstep });
+    if (role === 'asha') { this.setState({ ashaIntent: 'login', aSent: false, aOtp: '' }); this.go('ashaLogin'); }
+    else { this.setState({ authMode: 'login', otpSent: false, otp: '', pinMode: false, phone: known || '' }); this.go('login'); }
+  }
 
   async ensureToken() {
     if (!API.session) API.setSession(await API.post('/auth/guest', {}, { auth: false }));
@@ -772,8 +903,8 @@ class Component extends DCLogic {
     try {
       this.setState({ busy: true });
       const r = await API.post('/auth/otp/request', { phone, purpose: st.authMode === 'signup' ? 'mother_signup' : 'mother_login' }, { auth: false });
-      this.setState({ busy: false, otpSent: true, phoneMasked: r.phone_masked, otp: r.dev_otp || '', inboxUrl: r.delivered_to || '', resendAt: Date.now() + (r.resend_after || 30) * 1000 });
-      this.showToast(r.delivered_to ? T('OTP sent · read it in the SMS inbox (Mailpit)', 'ओटीपी भेजा गया · SMS इनबॉक्स (Mailpit) में देखें') : T('OTP sent to ', 'ओटीपी भेजा गया: ') + r.phone_masked, 5000);
+      this.setState({ busy: false, otpSent: true, phoneMasked: r.phone_masked, otp: r.dev_otp || '', inboxUrl: inboxFor(r.delivered_to), resendAt: Date.now() + (r.resend_after || 30) * 1000 });
+      this.showToast(otpSentToast(r), 5000);
     } catch (e) {
       this.setState({ busy: false });
       if (e.code === 'account_not_found') { this.setState({ authMode: 'signup', otpSent: false }); this.showToast(T('No account for this number yet. Tap Send OTP to sign up.', 'इस नंबर से अभी खाता नहीं है। साइन अप के लिए ओटीपी भेजें।'), 5000); }
@@ -806,9 +937,13 @@ class Component extends DCLogic {
   }
   async afterMotherLogin(tokens) {
     API.setSession(tokens);
-    this.setState({ busy: false, otpSent: false, otp: '', pin: '', pinMode: false, pMotherId: null, passportLoaded: false });
+    const keep = this.state.keepForm, step = this.state.resumeStep;
+    const typed = keep ? Object.fromEntries(Object.entries(this.state).filter(([k]) => /^p[A-Z]/.test(k) || k === 'contacts')) : null;
+    this.setState({ busy: false, otpSent: false, otp: '', pin: '', pinMode: false, pMotherId: null, passportLoaded: false, keepForm: false,
+      lastRole: 'mother', lastPhone: digits((tokens.user || {}).phone || '') });
     await this.loadMother();
-    if (this.state.me) { this.showToast(T('Welcome back', 'फिर से स्वागत है') + (this.firstName() ? ', ' + this.firstName() : '')); this.go('home'); }
+    if (this.state.me && !keep) { this.showToast(T('Welcome back', 'फिर से स्वागत है') + (this.firstName() ? ', ' + this.firstName() : '')); this.go('home'); }
+    else if (keep) { this.setState({ ...typed, pMotherId: null, pstep: step || 1, passportLoaded: true }); this.go('passport'); }
     else { this.resetPassportForm(); this.setState({ pstep: 1, passportLoaded: true }); this.go('passport'); }
   }
   async guest() {
@@ -825,7 +960,7 @@ class Component extends DCLogic {
     try {
       this.setState({ busy: true });
       const r = await API.post('/auth/asha/verify', body, { auth: false });
-      this.setState({ busy: false, aSent: true, aMasked: r.phone_masked, aOtp: r.dev_otp || '', inboxUrl: r.delivered_to || '' });
+      this.setState({ busy: false, aSent: true, aMasked: r.phone_masked, aOtp: r.dev_otp || '', inboxUrl: inboxFor(r.delivered_to) });
       this.showToast(r.in_registry ? T('ID verified · OTP sent', 'आईडी सत्यापित · ओटीपी भेजा गया') : T('Registered · OTP sent', 'पंजीकरण हुआ · ओटीपी भेजा गया'), 4000);
     } catch (e) {
       if (e.code === 'asha_details_required') { this.setState({ busy: false, aNeedDetails: true }); this.showToast(T('New ASHA ID · please add your details', 'नई आशा आईडी · अपनी जानकारी जोड़ें'), 4000); }
@@ -838,6 +973,7 @@ class Component extends DCLogic {
       this.setState({ busy: true });
       const tokens = await API.post('/auth/asha/login', { asha_reg_no: st.aReg.trim(), otp: digits(st.aOtp) }, { auth: false });
       API.setSession(tokens);
+      this.setState({ lastRole: 'asha' });
       this.setState({ busy: false, aVerified: tokens.user.verified_worker || 'Verified', aSent: false, aOtp: '', aNeedDetails: false });
       this.go('ashaDash');
     } catch (e) { this.fail(e); }
@@ -1074,13 +1210,17 @@ class Component extends DCLogic {
   // Speech to text for a form field: records, sends to /voice/transcribe, writes the text into the field.
   async dictate(field) {
     try {
-      const blob = await API.toggleRecording();
-      if (!blob) { this.setState({ dictating: true }); return this.showToast(T('Listening… tap the mic again to stop', 'सुन रहे हैं… रोकने के लिए माइक फिर दबाएँ'), 6000); }
-      this.setState({ dictating: false });
-      await this.ensureToken();
-      const fd = new FormData(); fd.append('file', new File([blob], 'name.webm', { type: blob.type || 'audio/webm' }));
-      const t = await API.post('/voice/transcribe', fd);
-      if (t.text) this.setState({ [field]: t.text.replace(/[.।]$/, '') }); else this.showToast(T("Couldn't hear that clearly", 'साफ़ सुनाई नहीं दिया'));
+      await this.record('dictating', async blob => {
+        try {
+          await this.ensureToken();
+          const fd = new FormData(); fd.append('file', new File([blob], 'name.webm', { type: blob.type || 'audio/webm' }));
+          fd.append('language', UI.lang); fd.append('context', 'name');
+          const t = await API.post('/voice/transcribe', fd);
+          if (!t.text) return this.showToast(T("Couldn't hear that clearly. Say just the name, close to the phone.", 'साफ़ सुनाई नहीं दिया। फ़ोन के पास सिर्फ़ नाम बोलें।'), 4000);
+          this.setState({ [field]: t.text.replace(/[.।]$/, '') });
+          if (t.confident === false) this.showToast(T('Please check the name I heard', 'जो नाम सुना वह जाँच लें'), 4000);
+        } catch (e) { this.fail(e); }
+      }, { silenceMs: 1200, maxMs: 12000 });
     } catch (e) { this.setState({ dictating: false }); this.fail(e); }
   }
 
@@ -1117,7 +1257,7 @@ class Component extends DCLogic {
   async loadNearby(query) {
     const st = this.state;
     const q = (query ?? '').trim();
-    this.setState({ nearState: 'busy', nearStatus: q ? T('Searching…', 'खोज रहे हैं…') : T('Finding your location…', 'आपकी लोकेशन ढूँढ रहे हैं…') });
+    this.setState({ nearState: 'busy', routeNote: '', nearStatus: q ? T('Searching…', 'खोज रहे हैं…') : T('Finding your location…', 'आपकी लोकेशन ढूँढ रहे हैं…') });
     try {
       await this.ensureToken();
       let params = 'limit=8&radius_km=40', how = '', note = '';
@@ -1155,41 +1295,244 @@ class Component extends DCLogic {
           : e.message });
     }
   }
-  // Real map (OpenStreetMap tiles via Leaflet) with her position and the facilities found.
-  renderMap() {
+  // Real map (OpenStreetMap tiles via Leaflet) with her position, the facilities found and the road route
+  // to the selected one (Azure Maps or OSRM on the server; straight-line estimate if no router answers).
+  async mapConfig() {
+    if (!this.mapCfg) { try { this.mapCfg = await API.get('/gis/map-config'); } catch (e) { this.mapCfg = {}; } }
+    return this.mapCfg;
+  }
+  async renderMap() {
     const el = typeof document !== 'undefined' && document.getElementById('jd-map');
     const loc = this.state.nearLoc;
     if (!el || !window.L || !loc) return;
     const L = window.L;
-    if (this.map && this.map.getContainer() !== el) { this.map.remove(); this.map = null; }
+    const dark = this.state.theme !== 'light';
+    if (this.map && (this.map.getContainer() !== el || this.mapDark !== dark)) { this.map.remove(); this.map = null; }
     if (!this.map) {
+      const cfg = await this.mapConfig();
+      if (this.map) return this.renderMap();
+      this.mapDark = dark;
+      el.classList.toggle('jd-map-dark', dark);
       this.map = L.map(el, { zoomControl: false, attributionControl: true }).setView([loc.latitude, loc.longitude], 12);
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(this.map);
+      // Map pictures come through our own server (/gis/tiles, cached from OpenStreetMap); if that fails, straight from OSM.
+      // Dark theme: the same tiles, colour-inverted by CSS (.jd-map-dark).
+      const osm = cfg.fallback_tile_url || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+      const main = cfg.tile_url ? (cfg.tile_url.startsWith('/') ? (window.JD_API_BASE || '') + cfg.tile_url : cfg.tile_url) : osm;
+      const opts = { maxZoom: 19, subdomains: 'abc', referrerPolicy: 'strict-origin-when-cross-origin',
+                     attribution: cfg.attribution || '© OpenStreetMap contributors' };
+      const tiles = L.tileLayer(main, opts).addTo(this.map);
+      let errors = 0;
+      tiles.on('tileerror', () => {
+        if (++errors === 4 && main !== osm) {
+          this.map.removeLayer(tiles);
+          L.tileLayer(osm, opts).addTo(this.map);
+        }
+      });
       L.control.zoom({ position: 'bottomright' }).addTo(this.map);
       this.mapLayer = L.layerGroup().addTo(this.map);
     }
     this.mapLayer.clearLayers();
     const pts = [[loc.latitude, loc.longitude]];
+    const sel = this.state.facilities[this.state.fac];
+    const rkey = sel && `${sel.id}@${loc.latitude.toFixed(3)},${loc.longitude.toFixed(3)}`;
+    const rt = sel && this.routes && this.routes[rkey];
+    if (rt && rt.path && rt.path.length > 1) {
+      L.polyline(rt.path, { color: '#0B1020', weight: 8, opacity: 0.35 }).addTo(this.mapLayer);
+      L.polyline(rt.path, { color: '#14B8A6', weight: 5, opacity: 0.95 }).addTo(this.mapLayer)
+        .bindTooltip(`${rt.distance_km} km · ${rt.minutes} min`);
+    }
     L.circleMarker([loc.latitude, loc.longitude], { radius: 9, color: '#FFFFFF', weight: 3, fillColor: '#14B8A6', fillOpacity: 1 })
       .addTo(this.mapLayer).bindTooltip(T('You', 'आप'));
     this.state.facilities.forEach((f, i) => {
       const on = this.state.fac === i;
       L.circleMarker([f.latitude, f.longitude], { radius: on ? 12 : 8, color: on ? '#FFFFFF' : '#0B1020', weight: on ? 3 : 2, fillColor: FAC_COL[f.type] || '#5EEAD4', fillOpacity: 1 })
-        .addTo(this.mapLayer).bindTooltip(f.name).on('click', () => this.setState({ fac: i }, () => this.renderMap()));
+        .addTo(this.mapLayer).bindTooltip(f.name).on('click', () => this.setState({ fac: i, routeNote: '' }, () => this.renderMap()));
       if (i < 4) pts.push([f.latitude, f.longitude]);
     });
     if (pts.length > 1 && !this.mapFitted) { this.map.fitBounds(pts, { padding: [28, 28], maxZoom: 14 }); this.mapFitted = true; }
     setTimeout(() => this.map && this.map.invalidateSize(), 60);
+    if (sel && !(this.routes && this.routes[rkey])) this.loadRoute(sel, loc, rkey);
+  }
+  async loadRoute(f, loc, key) {
+    this.routes = this.routes || {};
+    if (this.routes[key] || this.routeBusy === key) return;
+    this.routeBusy = key;
+    try {
+      const r = await API.get(`/gis/route?from_lat=${loc.latitude}&from_lon=${loc.longitude}&to_lat=${f.latitude}&to_lon=${f.longitude}`);
+      this.routes[key] = r;
+      const note = r.available
+        ? T(`Route to ${f.name}: ${r.distance_km} km by road · about ${r.minutes} min`, `${f.name} तक: सड़क से ${r.distance_km} किमी · लगभग ${r.minutes} मिनट`)
+        : T(`About ${r.distance_km} km to ${f.name} · tap Navigate for turn-by-turn directions`, `${f.name} लगभग ${r.distance_km} किमी · रास्ते के लिए Navigate दबाएँ`);
+      this.setState({ routeNote: note }, () => this.renderMap());
+    } catch (e) { this.routes[key] = { path: [] }; }
+    finally { this.routeBusy = null; }
+  }
+  // ASHA's area and map: she sets her area once from GPS (mothers nearby without an ASHA are connected to her);
+  // the map shows her mothers coloured by care level, PHC / CHC / DH near her, and the road route to a mother's home.
+  async setMyArea() {
+    if (this.state.areaBusy) return;
+    this.setState({ areaBusy: true });
+    try {
+      const pos = await API.locate({ fresh: true });
+      if (!pos || pos.lat == null) { this.setState({ areaBusy: false }); return this.showToast(locHelp(pos && pos.error), 7000); }
+      const r = await API.post('/asha/me/location', { latitude: pos.lat, longitude: pos.lon });
+      this.setState({ areaBusy: false });
+      this.showToast(r.newly_connected
+        ? T(`Area set: ${r.area.place || 'your location'} · ${r.newly_connected} mother(s) connected to you`, `क्षेत्र सेट: ${r.area.place || 'आपकी जगह'} · ${r.newly_connected} माँ आपसे जुड़ीं`)
+        : T(`Area set: ${r.area.place || 'your location'}`, `क्षेत्र सेट: ${r.area.place || 'आपकी जगह'}`), 5000);
+      this.loadDash(); this.loadAshaMap(); this.loadWorklist();
+    } catch (e) { this.setState({ areaBusy: false }); this.fail(e); }
+  }
+  // Smart daily work list: urgent first, then the shortest way from where she is now (or her area).
+  async loadWorklist() {
+    const load = async q => { try { this.setState({ work: await API.get('/asha/worklist' + (q || '')) }, () => this.renderAshaMap()); } catch (e) { /* dashboard still works */ } };
+    await load();  // at once, from her area
+    // Then from where she is right now, only if location is already allowed (never a surprise permission prompt).
+    try {
+      const perm = navigator.permissions && await navigator.permissions.query({ name: 'geolocation' });
+      if (!perm || perm.state !== 'granted') return;
+      const pos = await API.locate({ quickTimeout: 4000 });
+      if (pos && pos.lat != null) await load(`?lat=${pos.lat}&lon=${pos.lon}`);
+    } catch (e) { /* keep the area-based order */ }
+  }
+  async wlRemind(w) {
+    const k = w.tasks[0] && w.tasks[0].kind;
+    const kind = k === 'anc' ? 'anc' : k === 'ifa' ? 'ifa' : (k === 'birth_prep' || k === 'edd') ? 'birth_prep' : 'visit';
+    try {
+      const r = await API.post(`/asha/worklist/${w.mother_id}/remind`, { kind });
+      this.showToast(T(`Reminder sent to ${(w.name || '').split(' ')[0]}`, `${(w.name || '').split(' ')[0]} को याद दिलाया`) + (r.sms ? T(' (app + SMS)', ' (ऐप + SMS)') : ''), 3500);
+    } catch (e) { this.fail(e); }
+  }
+  async wlDone(w) {
+    try { await API.post(`/asha/worklist/${w.mother_id}/done`, { done: !w.done }); this.loadWorklist(); } catch (e) { this.fail(e); }
+  }
+  // Alerts for the ASHA (morning work list, quiet mothers, ANC due…) shown on her dashboard.
+  async loadAlerts() {
+    try { const r = await API.get('/notifications?unread_only=true&limit=4'); this.setState({ alerts: r.items || [] }); } catch (e) { /* optional */ }
+  }
+  async dismissAlert(a) {
+    this.setState(s => ({ alerts: s.alerts.filter(x => x.id !== a.id) }));
+    try { await API.post(`/notifications/${a.id}/read`); } catch (e) { /* already gone */ }
+  }
+  // Monthly report for the ANM, with estimated incentives; print / PDF, CSV and SMS to the ANM.
+  async loadReport(month) {
+    try { const r = await API.get('/asha/report' + (month ? `?month=${month}` : '')); this.setState({ report: r, repMonth: r.month }); } catch (e) { this.fail(e); }
+  }
+  shiftMonth(n) {
+    const [y, m] = (this.state.repMonth || isoToday().slice(0, 7)).split('-').map(Number);
+    const d = new Date(y, m - 1 + n, 1), key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (key > isoToday().slice(0, 7)) return;
+    this.loadReport(key);
+  }
+  async reportFile(format) {
+    const w = format === 'html' && typeof window !== 'undefined' ? window.open('', '_blank') : null;
+    try {
+      const res = await fetch(`${API.base}/asha/report?format=${format}&month=${this.state.repMonth}`, { headers: { Authorization: 'Bearer ' + API.session.access } });
+      if (!res.ok) throw new Error(T('Could not make the report', 'रिपोर्ट नहीं बन पाई'));
+      const url = URL.createObjectURL(await res.blob());
+      if (w) { w.location = url; return; }
+      const a = document.createElement('a'); a.href = url; a.download = `asha-report-${this.state.repMonth}.csv`; document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) { if (w) w.close(); this.fail(e); }
+  }
+  async shareReport() {
+    try { const r = await API.post(`/asha/report/share?month=${this.state.repMonth}`); this.showToast(T(`Summary sent to ${r.to} by SMS`, `${r.to} को SMS से सारांश भेजा`), 4000); }
+    catch (e) { this.fail(e); }
+  }
+  async loadAshaMap() {
+    try { this.setState({ ashaMap: await API.get('/asha/map'), pinSel: -1, pinRoute: '' }, () => this.renderAshaMap(true)); } catch (e) { /* the dashboard still works */ }
+  }
+  addTiles(map, cfg, el, dark) {
+    const L = window.L;
+    el.classList.toggle('jd-map-dark', dark);
+    const osm = cfg.fallback_tile_url || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const main = cfg.tile_url ? (cfg.tile_url.startsWith('/') ? (window.JD_API_BASE || '') + cfg.tile_url : cfg.tile_url) : osm;
+    const opts = { maxZoom: 19, subdomains: 'abc', referrerPolicy: 'strict-origin-when-cross-origin', attribution: cfg.attribution || '© OpenStreetMap contributors' };
+    const tiles = L.tileLayer(main, opts).addTo(map);
+    let errors = 0;
+    tiles.on('tileerror', () => { if (++errors === 4 && main !== osm) { map.removeLayer(tiles); L.tileLayer(osm, opts).addTo(map); } });
+  }
+  async renderAshaMap(fit) {
+    const el = typeof document !== 'undefined' && document.getElementById('jd-asha-map');
+    const d = this.state.ashaMap;
+    if (!el || !window.L || !d || !d.area.has_location) return;
+    const L = window.L, dark = this.state.theme !== 'light';
+    if (this.aMap && (this.aMap.getContainer() !== el || this.aMapDark !== dark)) { this.aMap.remove(); this.aMap = null; }
+    if (!this.aMap) {
+      const cfg = await this.mapConfig();
+      if (this.aMap) return this.renderAshaMap(fit);
+      this.aMapDark = dark;
+      this.aMap = L.map(el, { zoomControl: false }).setView([d.area.latitude, d.area.longitude], 12);
+      this.addTiles(this.aMap, cfg, el, dark);
+      L.control.zoom({ position: 'bottomright' }).addTo(this.aMap);
+      this.aLayer = L.layerGroup().addTo(this.aMap);
+      fit = true;
+    }
+    this.aLayer.clearLayers();
+    const me = [d.area.latitude, d.area.longitude], pts = [me];
+    (d.facilities || []).forEach(f => L.circleMarker([f.latitude, f.longitude], { radius: 6, color: '#0B1020', weight: 2, fillColor: FAC_COL[f.type] || '#60A5FA', fillOpacity: 0.9 })
+      .addTo(this.aLayer).bindTooltip(`${f.type} · ${f.name}`));
+    const sel = d.mothers[this.state.pinSel];
+    if (sel && this.aRoute && this.aRoute.key === sel.mother_id && this.aRoute.path.length > 1) {
+      L.polyline(this.aRoute.path, { color: '#0B1020', weight: 8, opacity: 0.35 }).addTo(this.aLayer);
+      L.polyline(this.aRoute.path, { color: '#14B8A6', weight: 5 }).addTo(this.aLayer);
+    }
+    d.mothers.forEach((m, i) => {
+      const on = i === this.state.pinSel;
+      L.circleMarker([m.latitude, m.longitude], { radius: on ? 11 : 8, color: on ? '#F8FAFC' : '#0B1020', weight: on ? 3 : 2,
+        dashArray: m.approximate ? '3 3' : null, fillColor: LEVEL_DOT[m.care_level] || '#94A3B8', fillOpacity: 0.95 })
+        .addTo(this.aLayer).bindTooltip(m.title).on('click', () => this.setState({ pinSel: i, pinRoute: '' }, () => this.renderAshaMap()));
+      pts.push([m.latitude, m.longitude]);
+    });
+    const work = this.state.work;
+    if (this.state.wlRoute && work) {
+      const stops = work.items.filter(i => !i.done && i.latitude != null);
+      const start = work.start ? [work.start.latitude, work.start.longitude] : me;
+      L.polyline([start, ...stops.map(i => [i.latitude, i.longitude])], { color: '#FACC15', weight: 4, dashArray: '8 8' }).addTo(this.aLayer);
+      stops.forEach(i => L.circleMarker([i.latitude, i.longitude], { radius: 1, opacity: 0, fillOpacity: 0 }).addTo(this.aLayer)
+        .bindTooltip(String(i.order), { permanent: true, direction: 'top', offset: [0, -8] }));
+      if (stops.length) pts.push(...stops.map(i => [i.latitude, i.longitude]));
+    }
+    L.circleMarker(me, { radius: 9, color: '#F8FAFC', weight: 3, fillColor: '#14B8A6', fillOpacity: 1 }).addTo(this.aLayer).bindTooltip(T('You', 'आप'));
+    if (fit) { if (pts.length > 1) this.aMap.fitBounds(pts, { padding: [28, 28], maxZoom: 14 }); else this.aMap.setView(me, 13); }
+  }
+  async pinRoute() {
+    const d = this.state.ashaMap, m = d && d.mothers[this.state.pinSel];
+    if (!m) return;
+    try {
+      const r = await API.get(`/gis/route?from_lat=${d.area.latitude}&from_lon=${d.area.longitude}&to_lat=${m.latitude}&to_lon=${m.longitude}`);
+      this.aRoute = { key: m.mother_id, path: r.path || [] };
+      this.setState({ pinRoute: r.available ? T(`${r.distance_km} km by road · about ${r.minutes} min`, `सड़क से ${r.distance_km} किमी · लगभग ${r.minutes} मिनट`)
+        : T(`About ${r.distance_km} km · tap Directions for the way`, `लगभग ${r.distance_km} किमी · रास्ते के लिए Directions दबाएँ`) }, () => this.renderAshaMap());
+    } catch (e) { this.fail(e); }
   }
   async loadDash() {
-    try { this.setState({ dash: await API.get('/asha/dashboard') }); }
+    try { this.setState({ dash: await API.get('/asha/dashboard') }, () => this.renderAshaMap()); }
     catch (e) { if (e.status === 401 || e.status === 403) { API.setSession(null); this.go('ashaLogin'); } }
   }
+  // Mother ↔ ASHA chat. A mother talks to her ASHA; an ASHA picks a mother in her Messages inbox.
+  chatWith() { return API.role === 'asha' && this.state.chatMother ? this.state.chatMother.mother_id : undefined; }
   async loadChat(silent) {
+    const mid = this.chatWith();
+    if (API.role === 'asha' && !mid) return;
     try {
-      const r = await API.get('/messages/history');
-      this.setState({ cMsgs: r.messages.map(m => ({ me: m.from === 'me', t: msgText(m) })), cPresence: 'ASHA · ' + (r.counterpart.presence || 'active') });
-    } catch (e) { if (!silent) this.fail(e); }
+      const r = await API.get('/messages/history' + (mid ? `?mother_id=${mid}` : ''));
+      this.setState({ cMsgs: r.messages.map(m => ({ me: m.from === 'me', t: msgText(m) })), cNoAsha: '',
+        cPresence: API.role === 'asha' ? T('Mother', 'माँ') + (this.state.chatMother.week ? ` · ${T('week', 'हफ़्ता')} ${this.state.chatMother.week}` : '') + (this.state.chatMother.has_app === false ? T(' · not on the app yet', ' · अभी ऐप पर नहीं') : '')
+          : 'ASHA · ' + (r.counterpart.presence || 'active') });
+    } catch (e) {
+      if (e.code === 'asha_not_assigned') {
+        clearInterval(this.poll);
+        return this.setState({ cNoAsha: e.message, cMsgs: [{ me: false, t: T('No ASHA worker near you has joined the app yet. You will be connected automatically as soon as one does.\n\nFor help now: ask the Health Assistant, or tap SOS / call 108 in an emergency.',
+          'आपके पास अभी कोई आशा दीदी ऐप से नहीं जुड़ी हैं। जैसे ही कोई जुड़ेंगी, आप अपने-आप जुड़ जाएँगी।\n\nअभी मदद के लिए: स्वास्थ्य सहायक से पूछें, या आपात स्थिति में SOS दबाएँ / 108 पर कॉल करें।') }], cPresence: T('Not connected yet', 'अभी नहीं जुड़ीं') });
+      }
+      if (!silent) this.fail(e);
+    }
+  }
+  async loadInbox() {
+    try { this.setState({ inbox: await API.get('/messages/conversations') }); } catch (e) { this.fail(e); }
+  }
+  openChat(c) {
+    this.setState({ chatMother: c, cMsgs: [], cInput: '' }, () => this.go('ashaChat'));
   }
   async loadLatestResult() {
     try { this.setState({ lastResult: await API.get('/assessment/latest') }); }
@@ -1267,9 +1610,102 @@ class Component extends DCLogic {
       if (today.celebration) this.setState({ celebrate: true, celebration: today.celebration });
     } catch (e) { this.fail(e); }
   }
-  async togglePlan() {
-    if (this.state.plan) return this.setState({ plan: false });
-    try { this.setState({ plan: true, today: await API.post('/companion/plan', { regenerate: true }) }); } catch (e) { this.fail(e); }
+  // Plan My Day by conversation: the companion asks how she wants her day, builds the plan from her answers
+  // and changes it when she asks ("move walk to 7 pm") or taps an item.
+  scrollChat(id) {
+    setTimeout(() => { const el = typeof document !== 'undefined' && document.getElementById(id); if (el) el.scrollTop = el.scrollHeight; }, 60);
+  }
+  async loadPlanChat() {
+    try {
+      const r = await API.get('/companion/chat?language=' + UI.lang);
+      const msgs = [{ me: false, t: r.greeting }, ...r.messages.map(m => ({ me: m.role === 'user', t: (m.input_mode === 'voice' ? '🎤 ' : '') + m.content }))];
+      this.setState({ pdMsgs: msgs, pdQuick: r.quick_replies || [], pdStage: r.stage, today: r.plan, pdUnderstood: '' });
+      this.scrollChat('jd-pd-chat');
+    } catch (e) { this.fail(e); }
+  }
+  async pdSend(text, mode) {
+    text = (text || '').trim();
+    if (!text || this.state.pdTyping) return;
+    this.setState(s => ({ pdMsgs: [...s.pdMsgs, { me: true, t: (mode === 'voice' ? '🎤 ' : '') + text }], pdTyping: true, pdInput: '', pdUnderstood: '' }));
+    this.scrollChat('jd-pd-chat');
+    try {
+      const r = await API.post('/companion/chat', { message: text, language: UI.lang, input_mode: mode || 'text' });
+      this.setState(s => ({ pdMsgs: [...s.pdMsgs, { me: false, t: r.reply }], pdTyping: false, pdQuick: r.quick_replies || [],
+        pdStage: r.stage, pdUnderstood: r.understood || '', today: r.plan }));
+      this.scrollChat('jd-pd-chat');
+      if (mode === 'voice' && this.readAloudOn()) this.speak(r.reply);
+      if (r.safety.emergency) this.showToast(T('Danger sign · tap SOS now', 'खतरे का संकेत · अभी SOS दबाएँ'), 4000);
+    } catch (e) { this.setState(s => ({ pdMsgs: [...s.pdMsgs, { me: false, t: e.message }], pdTyping: false })); }
+  }
+  // Voice: record → speech-to-text on the server → the text goes into the same conversation.
+  // Hands-free voice: the mic stops by itself when she pauses (a tone plays), then the words are sent.
+  // Tapping the mic again also stops it. onBlob gets the recording.
+  async record(flag, onBlob, opts) {
+    const stopped = () => this.setState({ [flag]: false });
+    const blob = await API.toggleRecording({ ...(opts || {}),
+      onAutoStop: b => { stopped(); onBlob(b); },
+      onNoSpeech: () => { stopped(); this.showToast(T("I didn't hear anything. Tap the mic and speak.", 'कुछ सुनाई नहीं दिया। माइक दबाकर बोलिए।'), 4000); },
+    });
+    if (!blob) { this.setState({ [flag]: true }); return this.showToast(T('Listening… speak, I will send when you pause', 'सुन रही हूँ… बोलिए, रुकते ही भेज दूँगी'), 4000); }
+    stopped();
+    if (blob.size) onBlob(blob);  // empty: stopped before she started speaking
+  }
+  async listen(flag, send, field) {
+    try {
+      await this.record(flag, async blob => {
+        try {
+          await this.ensureToken();
+          const fd = new FormData();
+          fd.append('file', new File([blob], 'voice.webm', { type: blob.type || 'audio/webm' }));
+          fd.append('language', UI.lang);
+          const t = await API.post('/voice/transcribe', fd);
+          const said = (t.text || '').trim();
+          if (!said) return this.showToast(T("Couldn't hear that clearly. Please speak again, close to the phone, or type.", 'साफ़ सुनाई नहीं दिया। फ़ोन के पास फिर से बोलें, या लिखें।'), 4000);
+          // The voice engine was unsure: show the words for her to fix or send, instead of acting on a guess.
+          if (t.confident === false && field) {
+            this.setState({ [field]: said });
+            return this.showToast(T('Please check what I heard, then tap send', 'जो सुना वह देख लें, फिर भेजें दबाएँ'), 4000);
+          }
+          send(said);
+        } catch (e) { this.fail(e); }
+      });
+    } catch (e) { this.setState({ [flag]: false }); this.fail(e); }
+  }
+  startEdit(t) { this.setState(s => s.editTask === t.id ? { editTask: null } : { editTask: t.id, peTime: t.time || '', peTitle: T(t.title, t.title_hi), pdAdding: false }); }
+  async saveEdit(t) {
+    const body = {};
+    if (this.state.peTime && this.state.peTime !== t.time) body.time = this.state.peTime.slice(0, 5);
+    if (this.state.peTitle.trim() && this.state.peTitle.trim() !== T(t.title, t.title_hi) && t.editableTitle) body.title = this.state.peTitle.trim();
+    if (!Object.keys(body).length) return this.setState({ editTask: null });
+    try { this.setState({ today: await API.put('/companion/today/tasks/' + t.id, body), editTask: null }); this.showToast(T('Plan updated', 'योजना बदल दी')); } catch (e) { this.fail(e); }
+  }
+  async deleteTask(t) {
+    try { this.setState({ today: await API.del('/companion/today/tasks/' + t.id), editTask: null }); this.showToast(T('Removed from today', 'आज से हटा दिया')); } catch (e) { this.fail(e); }
+  }
+  async addTask() {
+    const time = (this.state.naTime || '').slice(0, 5), title = this.state.naTitle.trim();
+    if (!time || !title) return this.showToast(T('Choose a time and write what you want to do', 'समय चुनें और काम लिखें'));
+    try { this.setState({ today: await API.post('/companion/today/tasks', { time, title }), pdAdding: false, naTime: '', naTitle: '' }); } catch (e) { this.fail(e); }
+  }
+
+  // Ask the Pregnancy Guide: back-and-forth questions about her week (pregnancy topics only, checked on the server).
+  greetGuide() {
+    this.setState({ gMsgs: [{ me: false, t: T(`Ask me anything about week ${this.state.week}: your baby, food, tests, aches, or what comes next.`, `हफ़्ता ${this.state.week} के बारे में कुछ भी पूछिए: बच्चा, खाना, जाँच, दर्द-तकलीफ़, या आगे क्या होगा।`) }] });
+  }
+  async gAsk(text, mode) {
+    text = (text || '').trim();
+    if (!text || this.state.gTyping) return;
+    const history = this.state.gMsgs.slice(1).slice(-6).map(m => ({ role: m.me ? 'user' : 'assistant', content: m.t.replace(/^🎤 /, '') }));
+    this.setState(s => ({ gMsgs: [...s.gMsgs, { me: true, t: (mode === 'voice' ? '🎤 ' : '') + text }], gTyping: true, gInput: '' }));
+    this.scrollChat('jd-g-chat');
+    try {
+      await this.ensureToken();
+      const r = await API.post('/guide/ask', { question: text, week: this.state.week, history, language: UI.lang });
+      this.setState(s => ({ gMsgs: [...s.gMsgs, { me: false, t: r.answer, off: !r.in_scope }], gTyping: false, gSugg: r.suggestions || [] }));
+      this.scrollChat('jd-g-chat');
+      if (mode === 'voice' && this.readAloudOn()) this.speak(r.answer);
+      if (r.safety.emergency) this.showToast(T('Danger sign · tap SOS now', 'खतरे का संकेत · अभी SOS दबाएँ'), 4000);
+    } catch (e) { this.setState(s => ({ gMsgs: [...s.gMsgs, { me: false, t: e.message }], gTyping: false })); }
   }
 
   // ---------------------------------------------------------------- assistant
@@ -1311,17 +1747,26 @@ class Component extends DCLogic {
   }
   async voiceA() {
     try {
-      const blob = await API.toggleRecording();
-      if (!blob) { this.setState({ aRec: true }); return this.showToast(T('Listening… tap the mic again to send', 'सुन रहे हैं… भेजने के लिए माइक फिर दबाएँ'), 6000); }
-      this.setState({ aRec: false, aTyping: true });
-      await this.ensureToken();
-      const fd = new FormData();
-      fd.append('file', new File([blob], 'voice.webm', { type: blob.type || 'audio/webm' }));
-      if (this.state.aThread) fd.append('thread_id', this.state.aThread);
-      fd.append('language', UI.lang);
-      const r = await API.post('/assistant/voice', fd);
-      this.setState(s => ({ aMsgs: [...s.aMsgs, { me: true, t: '🎤 ' + r.transcript.text }, { me: false, t: r.reply }], aTyping: false, aThread: r.thread_id }));
-      if (this.readAloudOn()) this.speak(r.reply);
+      await this.record('aRec', async blob => {
+        this.setState({ aTyping: true });
+        try {
+          await this.ensureToken();
+          const fd = new FormData();
+          fd.append('file', new File([blob], 'voice.webm', { type: blob.type || 'audio/webm' }));
+          if (this.state.aThread) fd.append('thread_id', this.state.aThread);
+          fd.append('language', UI.lang);
+          const r = await API.post('/assistant/voice', fd);
+          this.setState(s => ({ aMsgs: [...s.aMsgs, { me: true, t: '🎤 ' + r.transcript.text }, { me: false, t: r.reply }], aTyping: false, aThread: r.thread_id }));
+          if (this.readAloudOn()) this.speak(r.reply);
+        } catch (e) {
+          this.setState({ aTyping: false });
+          if (e.code === 'unclear_speech' && e.details && e.details.text) {
+            this.setState({ aInput: e.details.text });
+            return this.showToast(T('Please check what I heard, then tap send', 'जो सुना वह देख लें, फिर भेजें दबाएँ'), 4000);
+          }
+          this.fail(e);
+        }
+      });
     } catch (e) { this.setState({ aRec: false, aTyping: false }); this.fail(e); }
   }
   async loadThreads() {
@@ -1346,27 +1791,32 @@ class Component extends DCLogic {
   }
   async tVoice() {
     try {
-      const blob = await API.toggleRecording();
-      if (!blob) { this.setState({ tRec: true }); return this.showToast(T('Listening… tap the mic again to send', 'सुन रहे हैं… भेजने के लिए माइक फिर दबाएँ'), 6000); }
-      this.setState({ tRec: false });
-      const fd = new FormData(); fd.append('file', new File([blob], 'voice.webm', { type: blob.type || 'audio/webm' }));
-      const t = await API.post('/voice/transcribe', fd);
-      if (!t.text) return this.showToast(T("Couldn't hear that clearly. Please type instead.", 'साफ़ सुनाई नहीं दिया। कृपया लिखकर बताएँ।'));
-      this.talk({ message: t.text }, t.text);
+      await this.record('tRec', async blob => {
+        try {
+          const fd = new FormData(); fd.append('file', new File([blob], 'voice.webm', { type: blob.type || 'audio/webm' }));
+          fd.append('language', UI.lang);
+          const t = await API.post('/voice/transcribe', fd);
+          if (!t.text) return this.showToast(T("Couldn't hear that clearly. Please type instead.", 'साफ़ सुनाई नहीं दिया। कृपया लिखकर बताएँ।'));
+          if (t.confident === false) { this.setState({ tInput: t.text }); return this.showToast(T('Please check what I heard, then tap send', 'जो सुना वह देख लें, फिर भेजें दबाएँ'), 4000); }
+          this.talk({ message: t.text }, t.text);
+        } catch (e) { this.fail(e); }
+      });
     } catch (e) { this.setState({ tRec: false }); this.fail(e); }
   }
 
   // ---------------------------------------------------------------- ASHA chat & call
   async sendChat(body, quick) {
     if (!body && !quick) return;
+    if (this.state.cNoAsha) return this.showToast(this.state.cNoAsha, 5000);
     this.setState({ cInput: '' });
-    try { await API.post('/messages/send', { body: body || undefined, quick_action: quick || undefined }); await this.loadChat(true); }
+    try { await API.post('/messages/send', { mother_id: this.chatWith(), body: body || undefined, quick_action: quick || undefined }); await this.loadChat(true); }
     catch (e) { this.fail(e); }
   }
   async chatPhoto() {
     const file = await API.pickFile('image/*');
     if (!file) return;
     const fd = new FormData(); fd.append('file', file);
+    if (this.chatWith()) fd.append('mother_id', this.chatWith());
     try { await API.post('/messages/image', fd); this.loadChat(true); } catch (e) { this.fail(e); }
   }
   async chatReport() {
@@ -1382,7 +1832,7 @@ class Component extends DCLogic {
   async chatLocation() {
     const pos = await API.locate();
     if (pos.error) return this.showToast(locHelp(pos.error), 7000);
-    try { await API.post('/messages/location', { latitude: pos.lat, longitude: pos.lon }); this.loadChat(true); this.showToast(T('Location shared', 'लोकेशन भेजी')); }
+    try { await API.post('/messages/location', { mother_id: this.chatWith(), latitude: pos.lat, longitude: pos.lon }); this.loadChat(true); this.showToast(T('Location shared', 'लोकेशन भेजी')); }
     catch (e) { this.fail(e); }
   }
   async chatVoice() {
@@ -1391,11 +1841,16 @@ class Component extends DCLogic {
       if (!blob) { this.setState({ cRec: true }); return this.showToast(T('Recording… tap the mic again to send', 'रिकॉर्ड हो रहा है… भेजने के लिए माइक फिर दबाएँ'), 6000); }
       this.setState({ cRec: false });
       const fd = new FormData(); fd.append('file', new File([blob], 'note.webm', { type: blob.type || 'audio/webm' }));
+      if (this.chatWith()) fd.append('mother_id', this.chatWith());
       await API.post('/messages/voice', fd);
       this.loadChat(true);
     } catch (e) { this.setState({ cRec: false }); this.fail(e); }
   }
   async secureCall() {
+    if (API.role === 'asha' && this.chatWith()) {
+      try { const r = await API.post('/messages/call', { mother_id: this.chatWith() }); return this.showToast(T(`Dial ${r.relay_number} and enter code ${r.code}. Numbers stay private.`, `${r.relay_number} डायल करें और कोड ${r.code} डालें। नंबर छुपे रहेंगे।`), 8000); }
+      catch (e) { return this.fail(e); }
+    }
     if (API.role !== 'mother') return this.showToast(T('Log in to call your ASHA', 'आशा दीदी को कॉल करने के लिए लॉग इन करें'));
     try { const r = await API.post('/messages/call', {}); this.showToast(T(`Dial ${r.relay_number} and enter code ${r.code}. Your number stays private.`, `${r.relay_number} डायल करें और कोड ${r.code} डालें। आपका नंबर छुपा रहेगा।`), 8000); }
     catch (e) { this.fail(e); }
@@ -1611,29 +2066,59 @@ class Component extends DCLogic {
   }
   async openVisit(row) {
     const checks = {}; VISIT_CHECKS.forEach(([k]) => { checks[k] = false; });
-    this.setState({ vMother: row, vBp: '', vWeight: '', vHb: '', vChecks: checks, vNotes: '', vVoice: null, vRec: false });
+    this.setState({ vMother: row, vBp: '', vWeight: '', vHb: '', vChecks: checks, vNotes: '', vVoice: null, vRec: false, vFields: null, vUnderstood: '' });
     this.go('visit');
     const d = await this.motherDetail(row);
     this.setState({ vMother: { ...row, ...d.summary, passport: d.passport } });
   }
+  // Voice visit notes: she speaks, the recording is kept as the visit's voice note, and the words fill the form
+  // (BP, Hb, weight, symptoms, checklist, next visit). She checks and corrects before saving.
   async visitVoice() {
     try {
-      const blob = await API.toggleRecording();
-      if (!blob) { this.setState({ vRec: true }); return this.showToast(T('Recording… tap the mic again to stop', 'रिकॉर्ड हो रहा है… रोकने के लिए माइक फिर दबाएँ'), 6000); }
-      this.setState({ vRec: false, vVoice: blob });
+      await this.record('vRec', async blob => {
+        this.setState({ vVoice: blob, vReading: true });
+        try {
+          await this.ensureToken();
+          const fd = new FormData(); fd.append('file', new File([blob], 'visit.webm', { type: blob.type || 'audio/webm' }));
+          fd.append('language', UI.lang); fd.append('context', 'visit');
+          const t = await API.post('/voice/transcribe', fd);
+          const said = (t.text || '').trim();
+          if (!said) { this.setState({ vReading: false }); return this.showToast(T("Couldn't hear the notes clearly. Speak again or type them.", 'नोट्स साफ़ सुनाई नहीं दिए। फिर बोलें या लिखें।'), 4000); }
+          this.setState(s => ({ vNotes: s.vNotes && !s.vNotes.includes(said) ? `${s.vNotes}\n${said}` : (s.vNotes || said) }));
+          await this.fillFromNotes(said, t.confident === false);
+        } catch (e) { this.setState({ vReading: false }); this.fail(e); }
+      }, { silenceMs: 3500, maxMs: 120000 });
     } catch (e) { this.setState({ vRec: false }); this.fail(e); }
+  }
+  async fillFromNotes(text, unsure) {
+    this.setState({ vReading: true });
+    try {
+      const r = await API.post('/visit/understand', { text, language: UI.lang });
+      const f = r.fields || {};
+      const checks = { ...this.state.vChecks };
+      const c = f.checklist || {};
+      if (c.ifa_tablets_given) checks.ifa_tablets_given = true;
+      ['diet_counselling', 'danger_signs_explained', 'birth_preparedness_plan'].forEach(k => { if (c[k]) checks[k] = true; });
+      this.setState(s => ({ vReading: false, vFields: { ...(s.vFields || {}), ...f }, vChecks: checks,
+        vBp: f.bp || s.vBp, vWeight: f.weight_kg != null ? String(f.weight_kg) : s.vWeight, vHb: f.hemoglobin != null ? String(f.hemoglobin) : s.vHb,
+        vUnderstood: r.summary ? T('I understood: ', 'मैंने समझा: ') + r.summary + (unsure ? T(' · please check, the voice was unclear', ' · कृपया जाँचें, आवाज़ साफ़ नहीं थी') : '') : T('Nothing to fill from these notes. They will be saved as written.', 'इन नोट्स से कुछ भरने को नहीं मिला। ये जैसे हैं वैसे सेव होंगे।') }));
+    } catch (e) { this.setState({ vReading: false }); this.fail(e); }
   }
   async saveVisit() {
     const st = this.state;
     if (!st.vMother) return;
     if (st.vBp && !/^\s*\d{2,3}\s*\/\s*\d{2,3}\s*$/.test(st.vBp)) return this.showToast(T('Write BP like 118/76', 'BP ऐसे लिखें: 118/76'));
     const checklist = { ...st.vChecks };
-    if (checklist.ifa_tablets_given) checklist.ifa_tablets_given = 30;
+    const vf = st.vFields || {};
+    if (checklist.ifa_tablets_given) checklist.ifa_tablets_given = (vf.checklist && vf.checklist.ifa_tablets_given) || 30;
     try {
       this.setState({ busy: true });
       const v = await API.post('/visit/create', { mother_id: st.vMother.mother_id, bp: st.vBp.trim() || undefined,
         weight_kg: st.vWeight ? Number(st.vWeight) : undefined, hemoglobin: st.vHb ? Number(st.vHb) : undefined,
-        checklist, notes: st.vNotes.trim() || undefined, taking_ifa: st.vChecks.ifa_tablets_given || undefined });
+        checklist, notes: st.vNotes.trim() || undefined, symptoms: vf.symptoms || [],
+        taking_ifa: vf.taking_ifa != null ? vf.taking_ifa : (st.vChecks.ifa_tablets_given || undefined),
+        baby_moving_normally: vf.baby_moving_normally, anc_completed: !!vf.anc_completed, visit_type: vf.visit_type || undefined,
+        next_visit_date: vf.next_visit_date || undefined });
       if (st.vVoice) {
         const fd = new FormData(); fd.append('file', new File([st.vVoice], 'visit.webm', { type: st.vVoice.type || 'audio/webm' }));
         try { await API.post(`/visit/${v.id}/voice-note`, fd); } catch (e) { /* the visit itself is saved */ }
@@ -1642,7 +2127,7 @@ class Component extends DCLogic {
       const lvl = v.assessment ? T(v.assessment.result.label, v.assessment.result.label_hi) : '';
       this.showToast(T('Visit saved', 'विज़िट सेव हुई') + (lvl ? ' · ' + lvl : '') + (v.next_visit_date ? T(' · next visit ', ' · अगली विज़िट ') + fmtDate(v.next_visit_date, { day: 'numeric', month: 'short' }) : ''), 5000);
       this.setState(s => ({ vMother: { ...s.vMother, lastVisit: v } }));
-      this.loadDash();
+      this.loadDash(); this.loadWorklist();
     } catch (e) { this.fail(e); }
   }
   async openRefer(row, reason) {
@@ -1912,9 +2397,27 @@ class Component extends DCLogic {
       celebrateMsg: st.celebration ? T(st.celebration.message, st.celebration.message_hi) : T('You completed every wellness goal today.', 'आपने आज के सभी लक्ष्य पूरे किए।'),
 
       // companion
-      plan: st.plan, planHint: st.plan ? T('Here is your plan for today', 'आज का आपका प्लान') : T('Tap and say: "Plan my day"', 'दबाएँ और बोलें: "आज का प्लान बताओ"'),
-      togglePlan: () => this.togglePlan(),
-      planItems: ((today && today.tasks) || []).filter(t => t.time).map(t => ({ time: fmtTime(t.time), t: t.goal ? `${T(t.title, t.title_hi)}: ${T(t.detail || '', t.detail_hi) || ''}` : T(t.title, t.title_hi) })),
+      planHint: st.pdRec ? T('Listening… tap again to send', 'सुन रही हूँ… भेजने के लिए फिर दबाएँ')
+        : st.pdStage === 'planned' ? T('Tell me what to change, or tap an item', 'बताइए क्या बदलना है, या किसी काम पर टैप करें')
+        : T('Tap the mic and tell me how your day should look', 'माइक दबाएँ और बताइए आपका दिन कैसा हो'),
+      pdVoice: () => this.listen('pdRec', t => this.pdSend(t, 'voice'), 'pdInput'), pdMicBg: st.pdRec ? '#DC2626' : '#14B8A6', pdRing: st.pdRec ? 'rgba(220,38,38,.55)' : 'rgba(255,255,255,.12)', pdBigIc: st.pdRec ? 'icon-square jd-ink-red' : 'icon-mic jd-ink-teal',
+      pdList: st.pdMsgs.map(m => msg(m, '#0F766E', '#1F2937')), pdTyping: st.pdTyping,
+      pdUnderstood: st.pdUnderstood ? T('I understood: ', 'मैंने समझा: ') + st.pdUnderstood : '',
+      pdQuick: st.pdQuick.map(q => ({ t: T(q.text_en, q.text_hi), send: () => this.pdSend(T(q.text_en, q.text_hi)) })),
+      pdInput: st.pdInput, setPdInput: set('pdInput'), pdKey: enter(() => this.pdSend(st.pdInput)), pdSendIt: () => this.pdSend(st.pdInput),
+      planTitle: today && today.generated_by && today.generated_by.startsWith('chat') ? T('Your day, your way', 'आपका दिन, आपके हिसाब से') : T('Suggested day (tell me about yours above)', 'सुझाया गया दिन (ऊपर अपना दिन बताइए)'),
+      planItems: ((today && today.tasks) || []).filter(t => t.time).map(t => {
+        const editing = st.editTask === t.id, editableTitle = !['meal', 'medication', 'hydration', 'nutrition', 'sleep', 'baby', 'health'].includes(t.category) && !t.goal;
+        const task = { ...t, editableTitle };
+        return { time: fmtTime(t.time), t: t.goal && t.detail ? `${T(t.title, t.title_hi)}: ${T(t.detail, t.detail_hi)}` : T(t.title, t.title_hi),
+          sub: !t.goal && t.detail ? T(t.detail, t.detail_hi) : '', op: t.done ? 0.5 : 1, deco: t.done ? 'line-through' : 'none',
+          ck: t.done ? '#22C55E' : 'transparent', ckBd: t.done ? 'none' : '2px solid #334155', ckIc: t.done ? 'icon-check' : '',
+          toggle: () => this.toggleTask(t), edit: () => this.startEdit(t), editing, canDelete: t.category !== 'medication', canRename: editableTitle,
+          save: () => this.saveEdit(task), remove: () => this.deleteTask(t), cancel: () => this.setState({ editTask: null }) };
+      }),
+      peTime: st.peTime, setPeTime: set('peTime'), peTitle: st.peTitle, setPeTitle: set('peTitle'),
+      pdAdding: st.pdAdding, openAdd: () => this.setState(s => ({ pdAdding: !s.pdAdding, editTask: null })),
+      naTime: st.naTime, setNaTime: set('naTime'), naTitle: st.naTitle, setNaTitle: set('naTitle'), addTask: () => this.addTask(),
       water: today ? today.hydration.count : 0, waterGoal: today ? today.hydration.goal : 8,
       glasses: Array.from({ length: today ? today.hydration.goal : 8 }, (_, i) => ({ bg: i < (today ? today.hydration.count : 0) ? '#14B8A6' : '#1F2937' })),
       addWater: () => this.addWater(),
@@ -1948,14 +2451,20 @@ class Component extends DCLogic {
       tVoice: () => this.tVoice(), tMicBg: st.tRec ? '#DC2626' : '#E879F9',
 
       // my ASHA
-      ashaName: asha ? asha.name : T('Not assigned yet', 'अभी तय नहीं'), ashaSub: asha ? `${T('ASHA Worker', 'आशा कार्यकर्ता')} · ${asha.sub_centre || ''}` : ((st.ashaInfo && st.ashaInfo.message) || T('Add your village and pincode to get matched', 'आशा दीदी से जुड़ने के लिए गाँव और पिनकोड जोड़ें')),
+      ashaName: asha ? asha.name : T('Not assigned yet', 'अभी तय नहीं'), ashaSub: asha ? `${T('ASHA Worker', 'आशा कार्यकर्ता')} · ${asha.sub_centre || ''}` : ((st.ashaInfo && st.ashaInfo.message && T(st.ashaInfo.message, st.ashaInfo.message_hi)) || T('Add your village and pincode to get matched', 'आशा दीदी से जुड़ने के लिए गाँव और पिनकोड जोड़ें')),
       ashaAvail: asha ? '● ' + (asha.available ? T('Available', 'उपलब्ध') : T('Unavailable', 'उपलब्ध नहीं')) : '● —',
       matchedBy: st.ashaInfo && st.ashaInfo.matched_by ? `${st.ashaInfo.matched_by}.${st.ashaInfo.backup ? T(' Backup ASHA: ', ' दूसरी आशा: ') + st.ashaInfo.backup.name + '.' : ''}` : '',
       secureCall: () => this.secureCall(),
 
       // ASHA chat
       cList: st.cMsgs.map(m => msg(m, '#0F766E', '#111827')), cPresence: st.cPresence,
-      cQuick: [['Need ANC Help', 'जाँच में मदद', 'need_anc_help'], ['Request Home Visit', 'घर आएँ', 'request_home_visit'], ['Upload Report', 'रिपोर्ट भेजें', 'upload_report'], ['Nutrition Question', 'खान-पान का सवाल', 'nutrition_question']]
+      cQuick: API.role === 'asha' ? [
+        ['I will visit you today', 'मैं आज आपसे मिलने आऊँगी'], ['Please go to the PHC for a check-up', 'कृपया जाँच के लिए PHC जाएँ'],
+        ['Take your iron tablet daily after lunch', 'आयरन की गोली रोज़ खाने के बाद लें'], ['Send me a photo of your report', 'अपनी रिपोर्ट की फ़ोटो भेजें']]
+        .map(([en, hi]) => ({ t: T(en, hi), bg: '#111827', ink: '#F8FAFC', send: () => this.sendChat(T(en, hi)) }))
+        .concat([{ t: T('Danger sign? Call 108 now', 'खतरे का संकेत? अभी 108 पर कॉल करें'), bg: 'rgba(220,38,38,.16)', ink: '#FCA5A5',
+          send: () => this.sendChat(T('If you have bleeding, fits, severe headache, blurred vision or the baby is moving less, call 108 now and tell me.', 'खून आना, दौरे, तेज़ सिरदर्द, धुंधला दिखना या बच्चे की हलचल कम हो तो अभी 108 पर कॉल करें और मुझे बताएँ।')) }])
+      : [['Need ANC Help', 'जाँच में मदद', 'need_anc_help'], ['Request Home Visit', 'घर आएँ', 'request_home_visit'], ['Upload Report', 'रिपोर्ट भेजें', 'upload_report'], ['Nutrition Question', 'खान-पान का सवाल', 'nutrition_question']]
         .map(([t, h, k]) => ({ t: T(t, h), bg: '#111827', ink: '#F8FAFC', send: () => (k === 'upload_report' ? this.chatReport() : this.sendChat(null, k)) }))
         .concat([{ t: T('Emergency Help', 'आपात मदद'), bg: 'rgba(220,38,38,.16)', ink: '#FCA5A5', send: () => { this.sendChat(null, 'emergency_help'); this.go('emergency'); } }]),
       cInput: st.cInput, setCInput: set('cInput'), cKey: enter(() => this.sendChat(st.cInput.trim())), cSend: () => this.sendChat(st.cInput.trim()),
@@ -2015,11 +2524,11 @@ class Component extends DCLogic {
       // nearby
       facilities: st.facilities.map((f, i) => ({ name: f.name, meta: [f.type_label, f.display_meta ? f.display_meta.split(' · ').slice(1).join(' · ') : ''].filter(Boolean).join(' · '),
         col: FAC_COL[f.type] || '#5EEAD4', tag: f.is_24x7 ? '24×7' : (f.opd_hours ? f.opd_hours.slice(0, 18) : ''),
-        open: st.fac === i, ring: st.fac === i ? '0 0 0 2px ' + (FAC_COL[f.type] || '#5EEAD4') : 'none', pick: () => this.setState({ fac: i }, () => this.renderMap()),
+        open: st.fac === i, ring: st.fac === i ? '0 0 0 2px ' + (FAC_COL[f.type] || '#5EEAD4') : 'none', pick: () => this.setState({ fac: i, routeNote: '' }, () => this.renderMap()),
         call: () => (f.phone ? (location.href = 'tel:' + f.phone) : this.showToast(T('No phone number listed', 'फ़ोन नंबर उपलब्ध नहीं'))),
         nav: () => window.open(f.directions_url, '_blank') })),
 
-      nearStatus: st.nearStatus, nearInk: st.nearState === 'error' ? '#FCA5A5' : st.nearState === 'empty' ? '#FDE68A' : '#94A3B8',
+      nearStatus: st.nearStatus + (st.routeNote ? ' · ' + st.routeNote : ''), nearInk: st.nearState === 'error' ? '#FCA5A5' : st.nearState === 'empty' ? '#FDE68A' : '#94A3B8',
       nearQuery: st.nearQuery, setNearQuery: set('nearQuery'), nearKey: enter(() => this.loadNearby(st.nearQuery)),
       nearSearch: () => this.loadNearby(st.nearQuery), nearLocate: () => { this.mapFitted = false; this.setState({ nearQuery: '' }); this.loadNearby(); },
       noFacilities: st.nearState === 'empty' || st.nearState === 'error', nearBusy: st.nearState === 'busy',
@@ -2036,6 +2545,14 @@ class Component extends DCLogic {
       weeks: [-2, -1, 0, 1, 2].map(o => Math.max(4, Math.min(40, st.week + o))).filter((n, i, a) => a.indexOf(n) === i).map(n => ({ n, bg: n === st.week ? '#0F766E' : '#111827', bd: n === st.week ? '#14B8A6' : 'transparent', ink: n === st.week ? '#F8FAFC' : '#94A3B8', pick: () => { this.setState({ week: n }); this.loadGuide(n); } })),
       gNutrition: guide && guide.sections.nutrition ? firstSentences(T(guide.sections.nutrition.text, guide.sections.nutrition.text_hi), 2) : '',
       gAnc: guide ? `${guide.sections.anc_schedule.title}: ${firstSentences(guide.sections.anc_schedule.text, 1)}${anc && anc.date && st.week === weekNum ? T(' Next visit ', ' अगली जाँच ') + fmtDate(anc.date, { day: 'numeric', month: 'short' }) + '.' : ''}` : '',
+      gList: st.gMsgs.map(m => msg(m, '#0F766E', m.off ? 'rgba(234,179,8,.16)' : '#1F2937')), gTyping: st.gTyping,
+      gQuick: (st.gSugg.length ? st.gSugg : (st.week >= 28 ? [T('How do I count kicks?', 'हलचल कैसे गिनूँ?'), T('Signs of labour', 'प्रसव के संकेत'), T('What to pack for hospital?', 'अस्पताल के लिए क्या रखूँ?')]
+        : st.week >= 14 ? [T(`What is my baby doing in week ${st.week}?`, `हफ़्ता ${st.week} में बच्चा क्या कर रहा है?`), T('Which tests are due now?', 'अभी कौन सी जाँच है?'), T('Is walking safe?', 'क्या टहलना ठीक है?')]
+          : [T('What should I eat now?', 'अभी क्या खाऊँ?'), T('How to manage nausea?', 'जी मिचलाना कैसे कम करूँ?'), T('When is my first check-up?', 'पहली जाँच कब है?')]))
+        .slice(0, 3).map(t => ({ t, send: () => this.gAsk(t) })),
+      gInput: st.gInput, setGInput: set('gInput'), gKey: enter(() => this.gAsk(st.gInput)), gSendIt: () => this.gAsk(st.gInput),
+      gVoice: () => this.listen('gRec', t => this.gAsk(t, 'voice'), 'gInput'), gMicBg: st.gRec ? '#DC2626' : '#14B8A6',
+      gAskTitle: T(`Ask about week ${st.week}`, `हफ़्ता ${st.week} के बारे में पूछें`),
       gSchemes: guide ? guide.sections.schemes.map(s => SCHEME_SHORT[s.id] || T(s.title, s.title_hi)).join(', ') + T('. Ask your ASHA to apply.', '। आवेदन के लिए आशा दीदी से कहें।') : '',
 
       // ASHA dashboard
@@ -2043,13 +2560,85 @@ class Component extends DCLogic {
       emTitle: d ? T(`${d.emergency_cases.length} emergency case${d.emergency_cases.length === 1 ? '' : 's'}`, `${d.emergency_cases.length} आपात मामला`) : '',
       emSub: d && d.emergency_cases.length ? d.emergency_cases[0].title : '', openEmergencyCase: () => this.openEmergencyCase(),
       dMothers: dc.assigned_mothers ?? '–', dVisits: dc.todays_visits ?? '–', dAnc: dc.anc_due ?? '–',
+      areaTitle: d && d.area && d.area.has_location ? T('My area · ', 'मेरा क्षेत्र · ') + (d.area.place || T('location set', 'जगह सेट')) : T('Set my working area', 'अपना कार्य क्षेत्र सेट करें'),
+      areaSub: d && d.area && d.area.has_location
+        ? T(`${(st.ashaMap && st.ashaMap.mothers.length) || 0} mother${((st.ashaMap && st.ashaMap.mothers.length) || 0) === 1 ? '' : 's'} on the map · tap a pin`, `नक्शे पर ${(st.ashaMap && st.ashaMap.mothers.length) || 0} माँ · किसी पिन पर टैप करें`)
+        : T('Share your location once: mothers near you who have no ASHA get connected to you', 'एक बार अपनी लोकेशन दें: पास की जिन माँओं की आशा नहीं है, वे आपसे जुड़ेंगी'),
+      areaBtn: st.areaBusy ? T('Finding…', 'ढूँढ रहे हैं…') : d && d.area && d.area.has_location ? T('Update', 'बदलें') : T('Use my location', 'मेरी लोकेशन'),
+      areaBtnBg: d && d.area && d.area.has_location ? '#1F2937' : '#0F766E',
+      setMyArea: () => this.setMyArea(), areaHasMap: !!(d && d.area && d.area.has_location),
+      pinSel: !!(st.ashaMap && st.ashaMap.mothers[st.pinSel]),
+      pin: (() => { const m = st.ashaMap && st.ashaMap.mothers[st.pinSel]; if (!m) return {};
+        return { t: m.title, sub: (m.subtitle || '') + (m.distance_km != null ? T(` · ${m.distance_km} km away`, ` · ${m.distance_km} किमी दूर`) : '') + (m.approximate ? T(' · approx. (village)', ' · अनुमानित (गाँव)') : ''),
+          col: LEVEL_DOT[m.care_level] || '#94A3B8', note: st.pinRoute,
+          route: () => this.pinRoute(), open: () => this.openVisit(m),
+          dir: () => { if (typeof window !== 'undefined') window.open(`https://www.google.com/maps/dir/?api=1&origin=${st.ashaMap.area.latitude},${st.ashaMap.area.longitude}&destination=${m.latitude},${m.longitude}&travelmode=driving`, '_blank'); } }; })(),
+      ...(() => {
+        const w = st.work, sm = w && w.summary, PRIO = { 1: '#EF4444', 2: '#F97316', 3: '#FACC15', 4: '#5EEAD4' };
+        const mins = n => n >= 60 ? T(`${Math.floor(n / 60)} h ${n % 60} min`, `${Math.floor(n / 60)} घंटे ${n % 60} मिनट`) : T(`${n} min`, `${n} मिनट`);
+        return {
+          wlSummary: !w ? T('Loading…', 'लोड हो रहा है…') : sm.stops
+            ? T(`${sm.stops} to see${sm.bands && sm.bands.critical ? ` · ${sm.bands.critical} critical` : ''}${sm.bands && sm.bands.high ? ` · ${sm.bands.high} high` : ''} · ${sm.total_km} km · about ${mins(sm.drive_minutes)} by road (${mins(sm.walk_minutes)} on foot)`,
+                `${sm.stops} से मिलना${sm.bands && sm.bands.critical ? ` · ${sm.bands.critical} गंभीर` : ''}${sm.bands && sm.bands.high ? ` · ${sm.bands.high} ज़्यादा` : ''} · ${sm.total_km} किमी · सड़क से लगभग ${mins(sm.drive_minutes)} (पैदल ${mins(sm.walk_minutes)})`)
+            : T(`All done for today${sm.done ? ` · ${sm.done} visited` : ''}`, `आज का काम पूरा${sm.done ? ` · ${sm.done} से मिलीं` : ''}`),
+          wlCanRoute: !!(w && sm.stops && st.ashaMap && st.ashaMap.area.has_location),
+          wlRouteBtn: st.wlRoute ? T('Hide route', 'रास्ता छिपाएँ') : T('Route on map', 'नक्शे पर रास्ता'),
+          wlRouteBg: st.wlRoute ? '#0F766E' : '#1F2937',
+          wlToggleRoute: () => this.setState(s => ({ wlRoute: !s.wlRoute }), () => this.renderAshaMap(true)),
+          wlEmpty: w && !w.items.length ? T('No visits needed today. Mothers with checks due, reports or danger signs will appear here.', 'आज किसी भेंट की ज़रूरत नहीं। जाँच, रिपोर्ट या खतरे के संकेत वाली माँ यहाँ दिखेंगी।') : '',
+          wlItems: w ? w.items.map(i => ({
+            ...pTag(i), why: T('Why first: ', 'पहले क्यों: ') + whyLine(i, 3),
+            n: i.order, t: i.title, col: i.done ? '#334155' : PRIO[i.priority] || '#5EEAD4', op: i.done ? 0.55 : 1, deco: i.done ? 'line-through' : 'none',
+            sub: [i.village, i.leg_km != null ? T(`${i.leg_km} km from the last stop · ~${i.leg_minutes} min`, `पिछली जगह से ${i.leg_km} किमी · ~${i.leg_minutes} मिनट`) : '', i.phone].filter(Boolean).join(' · '),
+            tasks: i.tasks.map(k => '• ' + T(k.title, k.title_hi)).join('\n'), ink: i.priority === 1 && !i.done ? '#FCA5A5' : '#CBD5E1',
+            visit: () => this.openVisit(i), remind: () => this.wlRemind(i), done: () => this.wlDone(i),
+            doneT: i.done ? T('Undo', 'वापस') : T('Done', 'हो गया'), doneBg: i.done ? '#334155' : '#1F2937',
+            dir: () => { if (typeof window !== 'undefined' && i.latitude != null) window.open(`https://www.google.com/maps/dir/?api=1&destination=${i.latitude},${i.longitude}&travelmode=driving`, '_blank'); },
+          })) : [],
+        };
+      })(),
+      alertList: (st.alerts || []).map(a => ({ t: a.title, b: a.body, dismiss: () => this.dismissAlert(a),
+        ic: a.priority === 'high' || a.priority === 'urgent' ? 'icon-bell-ring' : 'icon-bell', ink: a.priority === 'high' || a.priority === 'urgent' ? '#FCA5A5' : '#5EEAD4',
+        bg: a.priority === 'high' || a.priority === 'urgent' ? 'rgba(220,38,38,.10)' : 'rgba(20,184,166,.08)', bd: a.priority === 'high' || a.priority === 'urgent' ? 'rgba(220,38,38,.35)' : 'rgba(20,184,166,.25)' })),
+      goReport: () => this.go('ashaReport'), goInbox: () => this.go('ashaInbox'),
+      dUnread: d && d.counts.unread_messages ? d.counts.unread_messages : 0,
+      chatName: API.role === 'asha' ? ((st.chatMother && st.chatMother.name) || T('Mother', 'माँ')) : (asha ? asha.name : T('My ASHA', 'मेरी आशा')),
+      inboxQuery: st.inboxQuery, setInboxQuery: set('inboxQuery'),
+      inboxList: ((st.inbox && st.inbox.conversations) || []).filter(c => !st.inboxQuery || (c.name || '').toLowerCase().includes(st.inboxQuery.toLowerCase()) || (c.village || '').toLowerCase().includes(st.inboxQuery.toLowerCase())).map(c => {
+        const lm = c.last_message;
+        const preview = lm ? (lm.from === 'me' ? T('You: ', 'आप: ') : '') + (lm.body || (lm.type === 'voice' ? '🎤 ' + T('Voice note', 'वॉइस नोट') : lm.type === 'image' ? '📷 ' + T('Photo', 'फ़ोटो') : lm.type === 'location' ? '📍 ' + T('Location', 'लोकेशन') : '…')) : T('No messages yet · tap to start', 'अभी कोई संदेश नहीं · शुरू करने के लिए टैप करें');
+        const d = lm ? new Date(lm.created_at) : null;
+        return { t: (c.name || T('Mother', 'माँ')) + (c.week ? ` · ${T('wk', 'हफ़्ता')} ${c.week}` : ''), sub: preview, ink: c.unread ? '#F8FAFC' : '#94A3B8',
+          initial: (c.name || 'M').trim().charAt(0).toUpperCase(), unread: c.unread || 0,
+          when: d ? (d.toDateString() === new Date().toDateString() ? d.toLocaleTimeString(UI.lang === 'hi' ? 'hi-IN' : 'en-IN', { hour: 'numeric', minute: '2-digit' }) : d.toLocaleDateString(UI.lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short' })) : '',
+          open: () => this.openChat(c) };
+      }),
+      inboxEmpty: st.inbox && !st.inbox.conversations.length ? T('No mothers connected to you yet. Set your area on the dashboard, or register a mother.', 'अभी कोई माँ आपसे नहीं जुड़ी। डैशबोर्ड पर अपना क्षेत्र सेट करें, या माँ का पंजीकरण करें।') : '',
+      ...(() => {
+        const r = st.report, c = r ? r.counts : {}, rupee = n => '₹' + Number(n || 0).toLocaleString('en-IN');
+        const tiles = [['home_visits', 'Home visits', 'गृह भेंट', '#F8FAFC'], ['anc_visits', 'ANC visits', 'ANC भेंट', '#F8FAFC'], ['high_risk_found', 'High-risk found', 'ज़्यादा जोखिम', '#F97316'],
+          ['referrals', 'Referrals', 'रेफ़रल', '#F8FAFC'], ['deliveries', 'Deliveries', 'प्रसव', '#F8FAFC'], ['ifa_tablets_given', 'IFA tablets', 'IFA गोलियाँ', '#5EEAD4'],
+          ['new_registrations', 'New mothers', 'नई माँ', '#F8FAFC'], ['anaemia_found', 'Hb below 11', 'Hb 11 से कम', '#FACC15'], ['emergencies', 'SOS cases', 'SOS', '#F87171']];
+        return {
+          repMonthLabel: r ? new Date(r.month + '-01T00:00:00').toLocaleDateString(UI.lang === 'hi' ? 'hi-IN' : 'en-IN', { month: 'long', year: 'numeric' }) : T('Loading…', 'लोड हो रहा है…'),
+          repPrev: () => this.shiftMonth(-1), repNext: () => this.shiftMonth(1), repNextOp: st.repMonth && st.repMonth >= isoToday().slice(0, 7) ? 0.35 : 1,
+          repTiles: tiles.map(([k, en, hi, col]) => ({ n: r ? c[k] : '–', t: T(en, hi), col })),
+          repIncentives: r ? r.incentives.map(i => ({ t: T(i.label, i.label_hi), sub: `${i.count} × ${rupee(i.rate)}`, amt: rupee(i.amount) })) : [],
+          repTotal: r ? rupee(r.incentive_total) : '–', repNote: r ? T(r.incentive_note, r.incentive_note_hi) : '',
+          repHigh: r ? r.high_risk.map(m => ({ t: m.title, sub: [m.subtitle, m.village].filter(Boolean).join(' · '), col: LEVEL_DOT[m.care_level] || '#F97316' })) : [],
+          repNoHigh: !!(r && !r.high_risk.length),
+          repPrint: () => this.reportFile('html'), repCsv: () => this.reportFile('csv'), repShare: () => this.shareReport(),
+          repShareT: T('Send summary to my ANM (SMS)', 'ANM को सारांश भेजें (SMS)'),
+        };
+      })(),
       visitList: d ? d.todays_visits.map(r => ({ t: r.title, sub: r.subtitle, col: LEVEL_DOT[r.care_level] || '#22C55E', open: () => this.openVisit(r) })) : [],
       noVisits: !!(d && !d.todays_visits.length),
 
       // ASHA: my mothers
       mQuery: st.mQuery, setMQuery: set('mQuery'), mKey: enter(() => this.loadMothers()),
       mFilters: M_FILTERS.map(([k, en, h]) => ({ t: T(en, h), ...pill(st.mFilter === k), pick: () => this.setState({ mFilter: k }, () => this.loadMothers()) })),
-      motherRows: st.mothers.map(r => ({ t: r.title, sub: [r.subtitle, r.village, r.phone].filter(Boolean).join(' · '), col: LEVEL_DOT[r.care_level] || '#475569',
+      motherRows: st.mothers.map(r => ({ ...pTag(r), why: r.priority_score >= 30 ? T('Why: ', 'क्यों: ') + whyLine(r, 2) : '', whyInk: r.priority_band === 'critical' ? '#FCA5A5' : '#CBD5E1',
+        t: r.title, sub: [r.subtitle, r.village, r.phone].filter(Boolean).join(' · '), col: (PBAND[r.priority_band] || [])[0] || LEVEL_DOT[r.care_level] || '#475569',
         visit: () => this.openVisit(r), refer: () => this.openRefer(r), passport: () => this.openPassport(null, r.mother_id, r.name) })),
       noMothers: !st.mothers.length,
 
@@ -2064,6 +2653,12 @@ class Component extends DCLogic {
       vBp: st.vBp, setVBp: set('vBp'), vWeight: st.vWeight, setVWeight: set('vWeight'), vHb: st.vHb, setVHb: set('vHb'),
       vChecks: VISIT_CHECKS.map(([k, en, h]) => { const on = !!st.vChecks[k]; return { t: T(en, h), box: on ? '#14B8A6' : 'transparent', boxBd: on ? '#14B8A6' : '#475569', ic: on ? 'icon-check' : '', toggle: () => this.setState({ vChecks: { ...st.vChecks, [k]: !on } }) }; }),
       vNotes: st.vNotes, setVNotes: set('vNotes'), visitVoice: () => this.visitVoice(), vMicInk: st.vRec ? '#F87171' : '#5EEAD4', vHasVoice: !!st.vVoice,
+      vRing: st.vRec ? 'rgba(220,38,38,.55)' : 'rgba(255,255,255,.14)', vMicIc: st.vRec ? 'icon-square jd-ink-red' : 'icon-mic jd-ink-teal',
+      vSpeakTitle: st.vRec ? T('Listening… speak your notes', 'सुन रही हूँ… नोट्स बोलिए') : st.vReading ? T('Filling the form…', 'फ़ॉर्म भर रही हूँ…') : T('Speak your visit notes', 'भेंट के नोट्स बोलिए'),
+      vSpeakSub: T('e.g. "BP 130 by 85, Hb 9.5, pair mein sujan, IFA 30 di, agli visit 3 din baad". I fill the form; you check it.',
+        'जैसे "BP 130 बटा 85, Hb 9.5, पैरों में सूजन, IFA 30 दी, अगली भेंट 3 दिन बाद"। मैं फ़ॉर्म भरूँगी, आप जाँच लें।'),
+      vUnderstood: st.vUnderstood, readNotes: () => (st.vNotes.trim() ? this.fillFromNotes(st.vNotes.trim()) : this.showToast(T('Write or speak your notes first', 'पहले नोट्स लिखें या बोलें'))),
+      readNotesT: st.vReading ? T('Reading…', 'पढ़ रही हूँ…') : T('Fill the form from my notes', 'नोट्स से फ़ॉर्म भरें'),
       saveVisit: () => (st.busy ? null : this.saveVisit()), visitSaveLabel: st.busy ? T('Saving…', 'सेव…') : T('Save', 'सेव'),
       visitRefer: () => this.openRefer(vm, [st.vBp && 'BP ' + st.vBp, st.vHb && 'Hb ' + st.vHb, st.vNotes.trim()].filter(Boolean).join('. ')),
 
@@ -2083,7 +2678,7 @@ class Component extends DCLogic {
       menuItems: menuDef.map(([k, ic, t, h]) => ({ ic, t: T(t, h), hi: hi ? '' : h, go: k === 'logout' ? () => this.logout() : go(k), bg: sc === k ? 'rgba(20,184,166,.14)' : 'transparent', color: k === 'emergency' || k === 'logout' ? '#FCA5A5' : sc === k ? '#5EEAD4' : '#F8FAFC' }))
     };
     ['role', 'login', 'ashaLogin', 'passport', 'passportDone', 'guest', 'profile', 'reports', 'referral', 'history', 'home', 'companion', 'assistant', 'talk', 'asha', 'ashaChat', 'assess', 'result', 'nearby', 'guide', 'emergency',
-      'ashaDash', 'ashaMothers', 'register', 'visit', 'refer'].forEach(k => { v['s_' + k] = sc === k; });
+      'ashaDash', 'ashaMothers', 'register', 'visit', 'refer', 'ashaReport', 'ashaInbox'].forEach(k => { v['s_' + k] = sc === k; });
     return v;
   }
 }

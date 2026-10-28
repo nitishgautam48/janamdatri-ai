@@ -62,35 +62,80 @@ class Settings(BaseSettings):
     referral_share_hours: int = 72
 
     # --- AI stack ----------------------------------------------------------
-    # Several local models share the work; every one is optional and falls back cleanly.
-    llm_provider: str = "ollama"  # ollama | openai (any OpenAI-compatible server, e.g. vLLM) | mock; falls back to the knowledge base if unreachable
+    # Cloud AI first (better Hindi, fast, no GPU), local models as backup, and the built-in knowledge base last,
+    # so the app always answers. Safety decisions (care level, SOS) never depend on any AI model.
+    #   LLM_PROVIDER=auto   → try LLM_CHAIN in order: providers without a key / not running are skipped
+    #   LLM_PROVIDER=gemini | groq | openrouter → that provider first, then the rest of LLM_CHAIN
+    #   LLM_PROVIDER=ollama | openai → local models only (LLM_MODEL / LLM_SECONDARY_MODEL)
+    #   LLM_PROVIDER=mock   → no model (tests): answers come from the knowledge base
+    llm_provider: str = "auto"
+    llm_chain: str = "gemini,groq,openrouter,ollama"
+    llm_secondary_tasks: str = "emotional,tip"  # these tasks use each provider's second (lighter) model
+
+    gemini_api_key: str | None = None  # Google AI Studio
+    gemini_base_url: str = "https://generativelanguage.googleapis.com/v1beta/openai"
+    gemini_model: str = "gemini-2.5-flash"
+    gemini_secondary_model: str | None = "gemini-2.5-flash-lite"
+    gemini_reasoning_effort: str | None = "none"  # turn "thinking" off: faster replies, fewer tokens used
+
+    groq_api_key: str | None = None  # console.groq.com
+    groq_base_url: str = "https://api.groq.com/openai/v1"
+    groq_model: str = "openai/gpt-oss-120b"
+    groq_secondary_model: str | None = "openai/gpt-oss-20b"
+
+    openrouter_api_key: str | None = None  # openrouter.ai (optional third backup)
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openrouter_model: str = "openai/gpt-oss-20b:free"
+
+    # Local models (optional; docker-compose.local-ai.yml): Ollama or any OpenAI-compatible server
     llm_base_url: str = "http://localhost:11434"
-    llm_model: str = "gemma3:12b"  # main model: Health Assistant, report explanations, knowledge answers
-    llm_secondary_model: str | None = "gemma2:9b"  # second model: its own tasks below, and backup for the main one
-    llm_secondary_tasks: str = "emotional,tip"  # Talk To Me and the daily tip use the second model
+    llm_model: str = "llama3.1:8b"
+    llm_secondary_model: str | None = None
     llm_api_key: str | None = None
     llm_timeout_seconds: float = 60.0
     llm_temperature: float = 0.3
 
-    whisper_provider: str = "auto"  # auto (faster-whisper if installed) | faster_whisper | mock (tests)
-    whisper_model: str = "base"  # base is fast on a laptop CPU; small / medium / large-v3 are more accurate but slower
+    # Privacy and limits for cloud AI
+    ai_redact: bool = True  # remove names, phone numbers, pincodes and IDs before text leaves the server
+    ai_daily_limit: int = 900  # cloud AI requests per day (all providers); after it, local model / knowledge base
+    ai_cloud_timeout_seconds: float = 30.0
+
+    # Speech to text: auto = Groq Whisper → Azure Speech → local faster-whisper (whichever is set up)
+    whisper_provider: str = "auto"  # auto | groq | azure | faster_whisper | mock (tests)
+    groq_whisper_model: str = "whisper-large-v3"  # most accurate for Hindi; falls back to whisper-large-v3-turbo
+    stt_daily_limit: int = 1500  # voice messages per day sent to cloud speech-to-text
+    whisper_model: str = "base"  # local faster-whisper (optional)
     whisper_device: str = "auto"
     whisper_compute_type: str = "int8"
 
-    tts_provider: str = "auto"  # auto (Coqui TTS if installed) | coqui | off (the browser's voice is used)
+    # Azure AI Speech (free F0 tier: 5 audio hours/month speech-to-text, 0.5M characters/month neural voices)
+    azure_speech_key: str | None = None
+    azure_speech_region: str = "centralindia"
+    azure_voice_hi: str = "hi-IN-SwaraNeural"
+    azure_voice_en: str = "en-IN-NeerjaNeural"
+    azure_stt_monthly_seconds: int = 16200  # 4.5 h: stays inside the free 5 h
+    azure_tts_monthly_chars: int = 450000  # stays inside the free 0.5M characters
+
+    # Text to speech (read aloud): auto = Azure neural voice → local Coqui → the phone / browser voice
+    tts_provider: str = "auto"  # auto | azure | coqui | off
     tts_model_en: str = "tts_models/en/ljspeech/vits"
     tts_model_hi: str = "tts_models/multilingual/multi-dataset/xtts_v2"
-    tts_speaker_hi: str = "Ana Florence"  # a built-in XTTS v2 voice
+    tts_speaker_hi: str = "Ana Florence"
     tts_device: str = "cpu"
 
-    ocr_provider: str = "auto"  # auto (PaddleOCR, then Tesseract) | paddle | tesseract | text_only
+    # Reading report photos: auto = cloud vision (Gemini, then OCR.space) → local PaddleOCR / Tesseract
+    ocr_provider: str = "auto"  # auto | gemini | ocrspace | paddle | tesseract | text_only
+    ocr_cloud_enabled: bool = True  # report photos are sent to Gemini / OCR.space; set false to keep them on the server
+    ocrspace_api_key: str | None = None
     ocr_lang: str = "en"
-    tesseract_cmd: str | None = None  # path to tesseract(.exe) if it is not on PATH
+    tesseract_cmd: str | None = None
     tesseract_lang: str = "eng+hin"
 
-    embedding_provider: str = "auto"  # auto (hybrid if the embedding model is pulled in Ollama) | hybrid | hashing | sentence_transformers
+    # Knowledge search: hybrid = keywords + semantic vectors (Gemini embeddings, or nomic-embed in Ollama)
+    embedding_provider: str = "auto"  # auto | gemini | hybrid (ollama) | hashing | sentence_transformers
+    gemini_embedding_model: str = "gemini-embedding-001"
     embedding_ollama_model: str = "nomic-embed-text"
-    embedding_model: str = "intfloat/multilingual-e5-small"  # for sentence_transformers
+    embedding_model: str = "intfloat/multilingual-e5-small"
     knowledge_top_k: int = 4
 
     risk_model_path: Path = BASE_DIR / "models" / "risk_gbm.joblib"
@@ -109,6 +154,18 @@ class Settings(BaseSettings):
     osm_pincode_api: str = "https://api.postalpincode.in/pincode/"  # India Post: pincode → post offices, district, state
     osm_user_agent: str = "Janamdatri-AI/1.0 (maternal health prototype; local install)"
     osm_timeout_seconds: float = 12.0
+    # Accuracy upgrades: Azure Maps (hospital search + road routes) when AZURE_MAPS_KEY is set, otherwise the free
+    # OSRM road router. Distances and travel times then follow real roads instead of a straight-line estimate.
+    azure_maps_key: str | None = None
+    routing_provider: str = "auto"  # auto (azure → ors → osrm, by which keys are set) | azure | ors | osrm | off
+    ors_api_key: str | None = None  # openrouteservice.org free key: road routes and distances (2,000 routes / day)
+    maptiler_key: str | None = None  # maptiler.com free key: map pictures (served through /gis/tiles, key stays on the server)
+    osrm_url: str = "https://router.project-osrm.org"
+    # Map pictures: served by our own server (/gis/tiles), fetched from these sources in order and cached on disk.
+    # osm = openstreetmap.org, osmfr = OpenStreetMap France (humanitarian style), esri = Esri World Street Map.
+    map_tile_sources: str = "maptiler,osm,osmfr,esri"  # maptiler is used only when MAPTILER_KEY is set
+    map_tile_url: str = "/api/v1/gis/tiles/{z}/{x}/{y}.png"  # or a full https URL of another tile server
+    map_attribution: str = "© OpenStreetMap contributors"
 
     # --- Celery ------------------------------------------------------------
     celery_enabled: bool = False

@@ -3,8 +3,8 @@ REM Run Janamdatri-AI on this computer.
 REM   App + API:        http://localhost:8000
 REM   SMS inbox (OTPs): http://localhost:8025   (Mailpit, started automatically)
 REM
-REM   run_local.bat            core app (SQLite, no Redis needed)
-REM   run_local.bat --with-ai  also installs Whisper (voice), PaddleOCR + Tesseract (report photos) and Coqui TTS
+REM   run_local.bat            core app (SQLite, no Redis needed); AI comes from the cloud keys in .env
+REM   run_local.bat --with-ai  also installs the optional local models (Whisper, PaddleOCR, Coqui TTS)
 setlocal
 cd /d "%~dp0"
 where py >nul 2>nul && (set "PY=py -3") || (set "PY=python")

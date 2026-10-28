@@ -22,16 +22,49 @@
     return session;
   }
 
-  async function refresh() {
+  // One refresh at a time. Each refresh token works once, so two requests that both find the access token
+  // expired must share one refresh; a second refresh with the same token would be refused and log her out.
+  var refreshing = null;
+  function sameUser(a, b) {
+    return a && b && a.role === b.role && (!a.user || !b.user || a.user.id === b.user.id);
+  }
+  async function doRefresh() {
     if (!session || !session.refresh) return false;
-    var r = await fetch(BASE + '/auth/refresh', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token: session.refresh })
-    });
-    if (!r.ok) { setSession(null); return false; }
+    var stored = load();
+    // Another tab of the app may already have used this refresh token: take its new tokens.
+    if (stored && stored.refresh && stored.refresh !== session.refresh && sameUser(stored, session)) {
+      session = stored;
+      return true;
+    }
+    var mine = session.refresh, r;
+    try {
+      r = await fetch(BASE + '/auth/refresh', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: mine })
+      });
+    } catch (e) { return false; }  // offline: keep the login, the request just fails
+    if (!r.ok) {
+      stored = load();
+      if (stored && stored.refresh && stored.refresh !== mine && sameUser(stored, session)) { session = stored; return true; }
+      if (r.status === 401 || r.status === 403) {
+        setSession(null);
+        try { window.dispatchEvent(new CustomEvent('jd-session-expired')); } catch (e) {}
+      }
+      return false;
+    }
     setSession(await r.json());
     return true;
   }
+  function refresh() {
+    if (!refreshing) refreshing = doRefresh().finally(function () { refreshing = null; });
+    return refreshing;
+  }
+  // Keep tabs in step: a login refreshed in another tab replaces this tab's tokens (same person only).
+  window.addEventListener('storage', function (e) {
+    if (e.key !== KEY) return;
+    var stored = load();
+    if (stored && sameUser(stored, session)) session = stored;
+  });
 
   async function req(method, path, body, opts) {
     opts = opts || {};
@@ -39,9 +72,11 @@
     var payload;
     if (body instanceof FormData) payload = body;
     else if (body !== undefined) { headers['Content-Type'] = 'application/json'; payload = JSON.stringify(body); }
-    if (session && session.access && opts.auth !== false) headers.Authorization = 'Bearer ' + session.access;
+    var used = session && session.access;
+    if (used && opts.auth !== false) headers.Authorization = 'Bearer ' + used;
     var r = await fetch(BASE + path, { method: method, headers: headers, body: payload });
-    if (r.status === 401 && opts.auth !== false && !opts.retried && await refresh()) {
+    if (r.status === 401 && opts.auth !== false && !opts.retried && used &&
+        ((session && session.access !== used) || await refresh())) {
       return req(method, path, body, Object.assign({}, opts, { retried: true }));
     }
     var data = null;
@@ -104,23 +139,82 @@
 
   /* Tap once to start recording, tap again to stop; resolves with an audio Blob. */
   var recorder = null;
-  function toggleRecording() {
+  // Voice recording. Tap once to start, tap again to stop. With opts.onAutoStop it also stops by itself once she
+  // pauses after speaking (like phone voice typing): the level of the microphone is measured every 100 ms; after
+  // speech, ~1.6 s of quiet ends the recording. A short tone plays when listening starts and when it stops.
+  // The start tone plays BEFORE recording begins, so the beep is not in the audio (Whisper turns a beep into
+  // made-up words) and the room's noise level is measured on quiet, not on the beep.
+  var SILENCE_MS = 1600, NO_SPEECH_MS = 8000, MAX_MS = 45000, TONE_MS = 120, TONE_GAP = 220;
+  var MIC = { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 };
+  function pickType() {
+    var types = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/mp4', 'audio/webm'];
+    for (var i = 0; i < types.length; i++) {
+      try { if (window.MediaRecorder.isTypeSupported(types[i])) return types[i]; } catch (e) { /* old browser */ }
+    }
+    return '';
+  }
+  function tone(ctx, freq, ms) {
+    try {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + ms / 1000);
+      o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime + ms / 1000 + 0.02);
+    } catch (e) { /* no sound is fine */ }
+  }
+  function toggleRecording(opts) {
     if (recorder) {
       var r = recorder; recorder = null;
+      if (r.state === 'inactive') { r._finish(); return Promise.resolve(new Blob([])); }  // tapped again during the tone
       return new Promise(function (resolve) { r._resolve = resolve; r.stop(); });
     }
+    opts = opts || {};
     if (!navigator.mediaDevices || !window.MediaRecorder) return Promise.reject(new Error('Voice input is not supported in this browser'));
-    return navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
-      var chunks = [];
-      var mr = new MediaRecorder(stream);
+    return navigator.mediaDevices.getUserMedia({ audio: MIC }).catch(function () {
+      return navigator.mediaDevices.getUserMedia({ audio: true });
+    }).then(function (stream) {
+      var chunks = [], ctx = null, timer = null, type = pickType();
+      var mr = new MediaRecorder(stream, type ? { mimeType: type, audioBitsPerSecond: 64000 } : undefined);
+      var AC = window.AudioContext || window.webkitAudioContext;
+      try { ctx = AC ? new AC() : null; } catch (e) { ctx = null; }
+      function finish() {
+        clearInterval(timer);
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        if (ctx) { tone(ctx, 620, 140); setTimeout(function () { try { ctx.close(); } catch (e) { /* closed */ } }, 300); }
+      }
+      mr._finish = finish;
       mr.ondataavailable = function (e) { if (e.data.size) chunks.push(e.data); };
       mr.onstop = function () {
-        stream.getTracks().forEach(function (t) { t.stop(); });
-        var type = (mr.mimeType || 'audio/webm').split(';')[0];
-        mr._resolve && mr._resolve(new Blob(chunks, { type: type }));
+        finish();
+        var blob = new Blob(chunks, { type: (mr.mimeType || 'audio/webm').split(';')[0] });
+        if (mr._resolve) mr._resolve(blob);
+        else if (mr._auto === 'silence' && opts.onAutoStop) opts.onAutoStop(blob);
+        else if (mr._auto === 'none' && opts.onNoSpeech) opts.onNoSpeech();
       };
-      mr.start();
       recorder = mr;
+      var begin = function () {
+        if (recorder !== mr) return;  // stopped during the tone
+        mr.start(250);
+        if (ctx && opts.onAutoStop) watch();
+      };
+      if (ctx) { tone(ctx, 880, TONE_MS); setTimeout(begin, TONE_MS + TONE_GAP); } else begin();
+      function watch() {
+        var an = ctx.createAnalyser(); an.fftSize = 1024;
+        ctx.createMediaStreamSource(stream).connect(an);
+        var buf = new Float32Array(an.fftSize), began = Date.now(), floor = null, spoke = 0, quiet = 0;
+        timer = setInterval(function () {
+          an.getFloatTimeDomainData(buf);
+          var sum = 0; for (var i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+          var level = Math.sqrt(sum / buf.length), now = Date.now();
+          if (floor === null || (now - began < 400 && level < floor)) floor = level; // room noise in the first moment
+          var talking = level > Math.max(0.015, (floor || 0) * 3);
+          if (talking) { spoke += 100; quiet = 0; } else quiet += 100;
+          var why = spoke >= 300 && quiet >= (opts.silenceMs || SILENCE_MS) ? 'silence' : spoke < 300 && now - began > NO_SPEECH_MS ? 'none'
+            : now - began > (opts.maxMs || MAX_MS) ? 'silence' : null;
+          if (why && recorder === mr) { recorder = null; mr._auto = why; mr.stop(); }
+        }, 100);
+      }
       return null; // recording started
     });
   }

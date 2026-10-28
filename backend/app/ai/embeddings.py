@@ -156,6 +156,50 @@ class SentenceTransformerEmbedder:  # pragma: no cover - optional heavy dependen
         return np.asarray(self._model.encode(prefixed, normalize_embeddings=True), dtype="float32")
 
 
+def _normalise(rows) -> np.ndarray:
+    arr = np.asarray(rows, dtype="float32")
+    norms = np.linalg.norm(arr, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    return arr / norms
+
+
+class GeminiEmbedder:
+    """Semantic vectors from Gemini embeddings (Google AI Studio key, OpenAI-compatible endpoint)."""
+
+    BATCH, DIMENSIONS = 50, 768
+
+    def __init__(self) -> None:
+        self.model = settings.gemini_embedding_model
+
+    def vectors(self, texts: list[str], kind: str = "document") -> np.ndarray | None:
+        if not texts:
+            return np.zeros((0, 0), dtype="float32")
+        if not settings.gemini_api_key:
+            return None
+        from app.ai import redact
+
+        rows: list = []
+        try:
+            with httpx.Client(timeout=settings.ai_cloud_timeout_seconds) as c:
+                for i in range(0, len(texts), self.BATCH):
+                    batch = texts[i:i + self.BATCH]
+                    if kind == "query" and settings.ai_redact:
+                        batch = [redact.scrub(t) for t in batch]
+                    body = {"model": self.model, "input": batch, "dimensions": self.DIMENSIONS}
+                    url = f"{settings.gemini_base_url.rstrip('/')}/embeddings"
+                    headers = {"Authorization": f"Bearer {settings.gemini_api_key}"}
+                    r = c.post(url, headers=headers, json=body)
+                    if r.status_code == 400:  # model without adjustable size
+                        body.pop("dimensions")
+                        r = c.post(url, headers=headers, json=body)
+                    r.raise_for_status()
+                    rows += [d["embedding"] for d in sorted(r.json()["data"], key=lambda d: d.get("index", 0))]
+            return _normalise(rows)
+        except (httpx.HTTPError, KeyError, ValueError) as exc:
+            log.warning("Gemini embeddings unavailable: %s", exc)
+            return None
+
+
 class OllamaEmbedder:
     """Semantic vectors from an Ollama embedding model (nomic-embed-text by default)."""
 
@@ -163,7 +207,8 @@ class OllamaEmbedder:
         self.model = model or settings.embedding_ollama_model
         self.base = settings.llm_base_url.rstrip("/")
 
-    def vectors(self, texts: list[str]) -> np.ndarray | None:
+    def vectors(self, texts: list[str], kind: str = "document") -> np.ndarray | None:
+        texts = [f"search_{kind}: {t}" for t in texts]
         if not texts:
             return np.zeros((0, 0), dtype="float32")
         try:
@@ -189,15 +234,17 @@ class OllamaEmbedder:
 
 class HybridEmbedder:
     """Keyword vectors (HashingEmbedder: exact words, Hindi, Hinglish, synonyms) joined with semantic vectors
-    from nomic-embed-text, so one inner product scores a weighted mix of both. Document vectors are cached on
-    disk. If the embedding model stops answering, the semantic half is left empty and keyword search still works.
+    (Gemini embeddings, or nomic-embed-text in Ollama), so one inner product scores a weighted mix of both.
+    Document vectors are cached on disk. If the embedding model stops answering, the semantic half is left
+    empty and keyword search still works.
     """
 
     KEYWORD_WEIGHT, SEMANTIC_WEIGHT = 0.45, 0.55
 
-    def __init__(self) -> None:
+    def __init__(self, semantic=None) -> None:
         self.keyword = HashingEmbedder()
-        self.semantic = OllamaEmbedder()
+        self.semantic = semantic or OllamaEmbedder()
+        self._recent: dict[str, np.ndarray] = {}
         self.sem_dim = 0
         self.name = f"hybrid (keywords + {self.semantic.model})"
 
@@ -226,7 +273,7 @@ class HybridEmbedder:
             except (OSError, ValueError):
                 sem = None
         if sem is None:
-            sem = self.semantic.vectors([f"search_document: {t}" for t in texts])
+            sem = self.semantic.vectors(texts, "document")
             if sem is not None:
                 try:
                     cache.parent.mkdir(parents=True, exist_ok=True)
@@ -243,9 +290,16 @@ class HybridEmbedder:
         kw = self.keyword.embed(texts)
         if not self.sem_dim:
             return kw
-        sem = self.semantic.vectors([f"search_query: {t}" for t in texts])
-        if sem is not None and sem.shape[1] != self.sem_dim:
-            sem = None
+        key = "\x00".join(texts)
+        sem = self._recent.get(key)
+        if sem is None:
+            sem = self.semantic.vectors(texts, "query")
+            if sem is not None and sem.shape[1] != self.sem_dim:
+                sem = None
+            if sem is not None:  # repeated questions (quick-question chips) do not call the model again
+                if len(self._recent) > 500:
+                    self._recent.pop(next(iter(self._recent)))
+                self._recent[key] = sem
         return self._join(kw, sem)
 
 
@@ -253,6 +307,8 @@ def get_embedder():
     provider = settings.embedding_provider
     if provider == "sentence_transformers":
         return SentenceTransformerEmbedder()
+    if provider == "gemini" or (provider == "auto" and settings.gemini_api_key):
+        return HybridEmbedder(GeminiEmbedder())
     if provider == "hybrid":
         return HybridEmbedder()
     if provider == "auto":

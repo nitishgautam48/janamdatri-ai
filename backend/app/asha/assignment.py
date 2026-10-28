@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.database.models import AshaWorker, Mother
 from app.gis.service import degree_box, haversine_km, mother_location
 
@@ -44,7 +45,11 @@ def rank_candidates(db: Session, mother: Mother) -> list[Candidate]:
         filters.append(AshaWorker.sub_centre_code == sub_centre)
     if sector:
         filters.append(AshaWorker.sector_code == sector)
-    q = select(AshaWorker).where(AshaWorker.verified.is_(True), AshaWorker.available.is_(True))
+    # Prototype registry (ASHA_MOCK_REGISTRY): newly self-registered ASHAs are accepted before official verification.
+    eligible = AshaWorker.verified.is_(True)
+    if settings.asha_mock_registry:
+        eligible = eligible | AshaWorker.user_id.isnot(None)  # has logged in at least once
+    q = select(AshaWorker).where(eligible, AshaWorker.available.is_(True))
     if loc:  # nearby by box, plus code matches anywhere
         dlat, dlon = degree_box(loc.latitude, MAX_DISTANCE_KM)
         filters.append(AshaWorker.latitude.between(loc.latitude - dlat, loc.latitude + dlat)

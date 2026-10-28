@@ -1,0 +1,14 @@
+# HTTPS for the app (free certificate from Let's Encrypt, renewed automatically).
+{$DOMAIN} {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Frame-Options "SAMEORIGIN"
+	}
+	handle /mailpit* {
+		reverse_proxy mailpit:8025
+	}
+	handle {
+		reverse_proxy api:8000
+	}
+}

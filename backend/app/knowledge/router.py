@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel, Field
 
 from app.ai.language import detect_language
 from app.ai.llm import ChatMessage, get_llm
@@ -10,7 +11,9 @@ from app.api.deps import DB, OptionalPrincipal
 from app.core.enums import Role
 from app.core.exceptions import ValidationFailed
 from app.core.pregnancy import gestational_week
+from app.core.ratelimit import limit
 from app.database.models import Mother
+from app.knowledge import guide_chat
 from app.knowledge.documents import CATEGORIES
 from app.knowledge.schemas import KnowledgeAnswer, KnowledgeHit, KnowledgeQuery
 from app.knowledge.service import get_kb, week_guide
@@ -41,6 +44,32 @@ def guide_week(db: DB, p: OptionalPrincipal, week: int | None = Query(None, ge=1
     return week_guide(w, visits if w == own_week else 0)
 
 
+class GuideTurn(BaseModel):
+    role: str = Field(pattern="^(user|assistant)$")
+    content: str = Field(max_length=4000)
+
+
+class GuideAsk(BaseModel):
+    question: str = Field(min_length=1, max_length=1000)
+    week: int | None = Field(None, ge=1, le=42)
+    history: list[GuideTurn] = Field(default_factory=list, max_length=12, description="Earlier turns (kept by the app)")
+    language: str | None = None
+
+
+@guide_router.post("/ask", dependencies=[Depends(limit("guide-ask", 120, 3600))])
+def guide_ask(body: GuideAsk, db: DB, p: OptionalPrincipal):
+    """Ask the Pregnancy Guide (typed or spoken). Answers only pregnancy, birth, newborn and mother-care questions,
+    for her week. Works for guests; nothing is saved."""
+    own_week, visits = _mother_week(db, p)
+    w = body.week or own_week or 20
+    name = None
+    if p and p.role == Role.MOTHER and p.user:
+        m = db.query(Mother).filter(Mother.user_id == p.user.id).first()
+        name = (m.name or "").split(" ")[0] if m else None
+    return guide_chat.ask(body.question, w, [t.model_dump() for t in body.history], body.language, name,
+                          visits if w == own_week else 0)
+
+
 @guide_router.get("/topics")
 def guide_topics(category: str = Query(..., description=f"One of {CATEGORIES}")):
     if category not in CATEGORIES:
@@ -66,7 +95,7 @@ def query(body: KnowledgeQuery, db: DB, p: OptionalPrincipal):
             ChatMessage("user", f"Context:\n{format_context([h.doc for h in hits])}\n\nQuestion: {body.question}"),
         ]) if llm.available else None
         if raw:
-            generated_by = "gemma+retrieval"
+            generated_by = "ai+retrieval"
         else:
             top = hits[0].doc
             raw = top["text_hi"] if lang == "hi" and top.get("text_hi") else top["text"]

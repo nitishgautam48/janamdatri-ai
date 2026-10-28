@@ -16,6 +16,7 @@ from pydantic import ValidationError
 from sqlalchemy import text
 
 from app.api.router import api_router
+from app.core import request_ctx
 from app.core.config import settings
 from app.core.exceptions import AppError
 from app.database.session import SessionLocal, engine
@@ -29,8 +30,9 @@ log = logging.getLogger("janamdatri")
 async def lifespan(app: FastAPI):
     if settings.is_production:
         problems = [name for name, bad in (
-            ("JWT_SECRET", settings.jwt_secret.startswith("change-me") or len(settings.jwt_secret) < 32),
+            ("JWT_SECRET", "change-me" in settings.jwt_secret or len(settings.jwt_secret) < 32),
             ("ADMIN_PASSWORD", settings.admin_password in ("ChangeMe!2026", "change-me-strong-password")),
+            ("POSTGRES_PASSWORD", ":janamdatri@" in settings.database_url),
         ) if bad]
         if problems:
             raise RuntimeError(f"Refusing to start in production with insecure settings: {', '.join(problems)}")
@@ -71,13 +73,15 @@ app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_cr
 @app.middleware("http")
 async def request_context(request: Request, call_next):
     rid = request.headers.get("x-request-id") or uuid.uuid4().hex[:16]
+    request_ctx.set_from_request(request.headers, request.url.scheme, request.headers.get("host"))
     start = time.perf_counter()
     response = await call_next(request)
     response.headers["x-request-id"] = rid
     response.headers["x-content-type-options"] = "nosniff"
-    response.headers["referrer-policy"] = "no-referrer"
-    log.info("%s %s %s %.0fms rid=%s", request.method, request.url.path, response.status_code,
-             (time.perf_counter() - start) * 1000, rid)
+    response.headers["referrer-policy"] = "strict-origin-when-cross-origin"  # outside map / route servers expect a referer
+    if "/gis/tiles/" not in request.url.path:  # a map view loads ~20 tiles; keep them out of the log
+        log.info("%s %s %s %.0fms rid=%s", request.method, request.url.path, response.status_code,
+                 (time.perf_counter() - start) * 1000, rid)
     return response
 
 
@@ -110,46 +114,67 @@ def health():
             conn.execute(text("SELECT 1"))
     except Exception:
         db_ok = False
-    from app.ai import tts
-    from app.ai.llm import has_model, ollama_models
+    from app.ai import tts, usage
+    from app.ai.llm import RoutedLLM, cloud_ready, has_model, ollama_models
+    from app.ai.whisper import get_whisper
+    from app.gis import routing, tiles
     from app.knowledge.service import get_kb
     from app.ocr.engine import ocr_engines
 
-    names = ollama_models() if settings.llm_provider == "ollama" else None
+    names = ollama_models() if settings.llm_provider in ("ollama", "auto") else None
 
     def model_state(name):
-        if settings.llm_provider not in ("ollama", "openai") or not name:
+        if settings.llm_provider not in ("ollama", "openai", "auto") or not name:
             return "off"
         if settings.llm_provider == "openai":
             return "configured"
         if names is None:
-            return "not reachable"
+            return "not running" if settings.llm_provider == "auto" else "not reachable"
         return "ready" if has_model(name, names) else "not pulled yet"
 
+    def key_state(provider):
+        return "ready" if cloud_ready(provider) else "no key"
+
+    cloud = {"gemini": {"model": settings.gemini_model, "state": key_state("gemini")},
+             "groq": {"model": settings.groq_model, "state": key_state("groq")},
+             "openrouter": {"model": settings.openrouter_model, "state": key_state("openrouter")},
+             "azure_speech": {"region": settings.azure_speech_region,
+                              "state": "ready" if settings.azure_speech_key else "no key"},
+             "azure_maps": {"state": "ready" if settings.azure_maps_key else "no key"}}
     main_state = model_state(settings.llm_model)
     second_state = model_state(settings.llm_secondary_model)
-    llm_state = ("connected" if "ready" in (main_state, second_state) else
-                 "not reachable · answering from the knowledge base") if settings.llm_provider in ("ollama", "openai") else "off"
-    try:
-        import faster_whisper  # noqa: F401
-
-        whisper = f"whisper-{settings.whisper_model}"
-    except ImportError:
-        whisper = "not installed (voice input off)"
+    route = RoutedLLM("assistant")
+    chain = [m for m in route.models]
+    if any(cloud_ready(p) for p in ("gemini", "groq", "openrouter")) and settings.llm_provider not in ("ollama", "openai", "mock"):
+        llm_state = "connected (cloud) · knowledge base as last fallback"
+    elif "ready" in (main_state, second_state):
+        llm_state = "connected (local)"
+    else:
+        llm_state = "off · answering from the knowledge base" if settings.llm_provider == "mock" else \
+            "no AI key or local model · answering from the knowledge base"
+    stt = get_whisper().engines()
     kb = get_kb()
     engines = ocr_engines()
     return {"status": "ok" if db_ok else "degraded", "database": db_ok,
-            "llm": {"provider": settings.llm_provider, "model": settings.llm_model, "state": llm_state,
+            "llm": {"provider": settings.llm_provider, "model": route.model, "state": llm_state, "chain": chain,
                     "models": {"main": {"name": settings.llm_model, "state": main_state},
                                "second": {"name": settings.llm_secondary_model, "state": second_state,
                                           "tasks": settings.llm_secondary_tasks}}},
+            "cloud": cloud,
+            "limits": usage.summary(),
+            "privacy": {"redaction": settings.ai_redact, "report_photos_to_cloud": bool(
+                settings.ocr_cloud_enabled and (settings.gemini_api_key or settings.ocrspace_api_key))},
             "search": {"documents": len(kb.store.docs), "embedder": getattr(kb.store.embedder, "name", "keywords"),
-                       "embedding_model": {"name": settings.embedding_ollama_model,
-                                           "state": model_state(settings.embedding_ollama_model)}},
-            "speech": whisper if settings.whisper_provider != "mock" else "mock",
+                       "embedding_model": {"name": settings.gemini_embedding_model if settings.gemini_api_key
+                                           else settings.embedding_ollama_model,
+                                           "state": "ready" if settings.gemini_api_key else
+                                           model_state(settings.embedding_ollama_model)}},
+            "speech": " → ".join(stt) if stt else "off (no key or local model: typing works)",
             "text_to_speech": tts.status(),
-            "ocr": " + ".join(engines) if engines else "pdf text only (install requirements-ai.txt for photos)",
-            "maps": "openstreetmap (online) + bundled gazetteer" if settings.osm_enabled else "bundled gazetteer only"}
+            "ocr": " → ".join(engines) if engines else "pdf text only (add a Gemini key or install Tesseract for photos)",
+            "maps": {"facilities": ("azure maps + " if settings.azure_maps_key else "") +
+                     ("openstreetmap (online) + bundled gazetteer" if settings.osm_enabled else "bundled gazetteer only"),
+                     "routing": routing.provider(), "map_tiles": tiles.source()}}
 
 
 app.include_router(api_router, prefix=settings.api_prefix)

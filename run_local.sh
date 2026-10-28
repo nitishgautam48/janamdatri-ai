@@ -3,8 +3,8 @@
 #   App + API:        http://localhost:8000
 #   SMS inbox (OTPs): http://localhost:8025   (Mailpit, started automatically)
 #
-#   ./run_local.sh            core app (SQLite, no Redis needed)
-#   WITH_AI=1 ./run_local.sh  also installs Whisper (voice), PaddleOCR + Tesseract (report photos) and Coqui TTS
+#   ./run_local.sh            core app (SQLite, no Redis needed); AI comes from the cloud keys in .env
+#   WITH_AI=1 ./run_local.sh  also installs the optional local models (Whisper, PaddleOCR, Coqui TTS)
 set -euo pipefail
 cd "$(dirname "$0")"
 PY="${PYTHON:-python3}"

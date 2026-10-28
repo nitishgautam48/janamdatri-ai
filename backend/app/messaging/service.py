@@ -31,7 +31,8 @@ def conversation(db: Session, p: Principal, mother_id: uuid.UUID | None) -> tupl
         mother = get_current_mother(db, p)
         asha_id = mother.assigned_asha_id or mother.backup_asha_id
         if not asha_id:
-            raise NotFound("No ASHA worker assigned yet. Complete your passport location to get matched.",
+            raise NotFound("No ASHA worker near you has joined yet. You'll be connected automatically when one does; "
+                           "for help now use the Health Assistant or SOS (108).",
                            code="asha_not_assigned")
         return mother, db.get(AshaWorker, asha_id)
     if p.role == Role.ASHA:

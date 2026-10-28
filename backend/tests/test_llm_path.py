@@ -68,7 +68,7 @@ def test_gemma_answers_are_grounded_and_scrubbed(client, fake_server, monkeypatc
     create_passport(client, token, week=20, name="Sita Devi")
     seen.clear()
     r = client.post("/api/v1/assistant/chat", json={"message": "What should I eat for anaemia?"}, headers=auth(token)).json()
-    assert r["generated_by"] == "gemma"
+    assert r["generated_by"] == "ai"
     assert "89" not in r["reply"] and "%" not in r["reply"] and "Eat palak and chana daily" in r["reply"]
     assert "dose your doctor prescribed" in r["reply"]
     system = seen[-1]["body"]["messages"][0]["content"]
@@ -77,5 +77,5 @@ def test_gemma_answers_are_grounded_and_scrubbed(client, fake_server, monkeypatc
     assert "%" not in e["reply"]
     assert "NOT a questionnaire" in seen[-1]["body"]["messages"][0]["content"]
     k = client.post("/api/v1/knowledge/query", json={"question": "iron rich food"}).json()
-    assert k["generated_by"] == "gemma+retrieval" and "%" not in k["answer"]
+    assert k["generated_by"] == "ai+retrieval" and "%" not in k["answer"]
     monkeypatch.setattr(llm_mod, "_client", None)

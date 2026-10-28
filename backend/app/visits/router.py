@@ -9,6 +9,7 @@ from fastapi import APIRouter, File, Query, UploadFile, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import select
 
+from app.ai.llm import get_llm
 from app.ai.whisper import get_whisper
 from app.api.deps import DB, CurrentAsha, CurrentPrincipal, resolve_mother
 from app.assessment import service as assessment_service
@@ -21,6 +22,7 @@ from app.core.pregnancy import anc_target_date, gestational_week, next_anc
 from app.core.storage import AUDIO_TYPES, absolute_path, save_upload
 from app.database.base import utcnow
 from app.database.models import Visit
+from app.visits import understand as notes
 
 router = APIRouter(prefix="/visit", tags=["Home Visits"])
 NEXT_VISIT_DAYS = {CareLevel.IMMEDIATE_CARE: 1, CareLevel.MEDICAL_REVIEW: 3, CareLevel.NEEDS_ATTENTION: 7,
@@ -103,6 +105,22 @@ def create(body: VisitIn, db: DB, p: CurrentPrincipal, asha: CurrentAsha):
     return out
 
 
+class NotesIn(BaseModel):
+    text: str = Field(min_length=2, max_length=4000)
+    language: str | None = None
+
+
+@router.post("/understand")
+def understand_notes(body: NotesIn, asha: CurrentAsha):
+    """Spoken or typed visit notes → visit-form fields (BP, Hb, weight, symptoms, checklist, next visit…), for the
+    ASHA to check before saving. Nothing is saved here."""
+    found = notes.understand(body.text, get_llm("visit"))
+    used_model = found.pop("_model", False)
+    hi = body.language == "hi"
+    return {"fields": found, "summary": notes.summary(found, hi) or None,
+            "generated_by": "rules+ai" if used_model else "rules"}
+
+
 @router.post("/{visit_id}/voice-note")
 async def voice_note(visit_id: uuid.UUID, db: DB, p: CurrentPrincipal, asha: CurrentAsha, file: UploadFile = File(...)):
     v = db.get(Visit, visit_id)
@@ -110,7 +128,7 @@ async def voice_note(visit_id: uuid.UUID, db: DB, p: CurrentPrincipal, asha: Cur
         raise NotFound("Visit not found")
     rel, _, _ = await save_upload(file, f"visits/{v.mother_id}", AUDIO_TYPES)
     v.voice_note_path = rel
-    t = get_whisper().transcribe(absolute_path(rel))
+    t = get_whisper().transcribe(absolute_path(rel), context="visit")
     if t.text:
         v.notes = ((v.notes + "\n") if v.notes else "") + f"[Voice note] {t.text}"
     db.commit()

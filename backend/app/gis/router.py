@@ -2,14 +2,16 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy import select
 
 from app.api.deps import DB, AdminUser, OptionalPrincipal
+from app.core.config import settings
 from app.core.enums import CareLevel, Role
 from app.core.exceptions import NotFound, ValidationFailed
+from app.core.ratelimit import limit
 from app.database.models import AssessmentResult, Facility, GISMapping, Mother
-from app.gis import service
+from app.gis import routing, service, tiles
 from app.gis.schemas import FacilityIn, GISMappingIn
 
 router = APIRouter(prefix="/gis", tags=["GIS Navigation"])
@@ -48,6 +50,41 @@ def nearby(db: DB, p: OptionalPrincipal, lat: float | None = None, lon: float | 
         type = sorted({t.upper() for t in type} | ({"HOSP"} if any(t.upper() == "DH" for t in type) else set()))
     items = service.nearby_facilities(db, loc, types=type, radius_km=radius_km, limit=limit)
     return {"location": loc.as_dict(), "count": len(items), "facilities": items}
+
+
+@router.get("/route")
+def road_route(from_lat: float = Query(..., ge=-90, le=90), from_lon: float = Query(..., ge=-180, le=180),
+               to_lat: float = Query(..., ge=-90, le=90), to_lon: float = Query(..., ge=-180, le=180)):
+    """Road route to a facility: distance, travel time and the line to draw on the map (Azure Maps or OSRM).
+    ``available: false`` when no router is reachable: the app then shows the straight-line estimate."""
+    r = routing.route((from_lat, from_lon), (to_lat, to_lon))
+    if not r:
+        straight = service.haversine_km(from_lat, from_lon, to_lat, to_lon)
+        km, minutes = service.travel_estimate(straight)
+        return {"available": False, "distance_km": km, "minutes": minutes, "path": [], "provider": routing.provider()}
+    return {"available": True, **r}
+
+
+@router.get("/map-config")
+def map_config():
+    """Map tiles and routing used by the app."""
+    return {"tile_url": settings.map_tile_url, "tile_source": tiles.source(),
+            "attribution": ("© MapTiler " if tiles.source() == "maptiler" else "") + settings.map_attribution,
+            "fallback_tile_url": tiles.SOURCES["osm"],
+            "routing": routing.provider(), "facilities": "azure maps + openstreetmap" if settings.azure_maps_key
+            else "openstreetmap"}
+
+
+@router.get("/tiles/{z}/{x}/{y}.png", dependencies=[Depends(limit("map-tiles", 4000, 3600))],
+            responses={200: {"content": {"image/png": {}}}})
+def tile(z: int, x: int, y: int):
+    """A map picture, fetched once from OpenStreetMap (or a backup source) and then served from the server's copy."""
+    if not tiles.valid(z, x, y):
+        raise NotFound("No such map tile", code="tile_not_found")
+    data = tiles.get(z, x, y)
+    if data is None:
+        return Response(status_code=503, headers={"Cache-Control": "no-store"})
+    return Response(data, media_type=tiles.media_type(data), headers={"Cache-Control": "public, max-age=604800"})
 
 
 @router.get("/facilities")

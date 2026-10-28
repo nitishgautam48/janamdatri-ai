@@ -11,7 +11,7 @@ from app.core.config import settings
 from app.core.enums import CARE_LEVEL_FACILITY, CareLevel, FacilityType
 from app.core.exceptions import ValidationFailed
 from app.database.models import Facility, GISMapping, Mother
-from app.gis import osm
+from app.gis import azure_maps, osm, routing
 
 ROAD_FACTOR = 1.3  # straight-line → typical rural road distance
 FACILITY_LABELS = {"SC": "Sub Centre", "PHC": "Primary Health Centre", "CHC": "Community Health Centre",
@@ -149,19 +149,36 @@ def facility_dict(f: Facility, loc: Location | None = None) -> dict:
         d.update(distance_km=road, travel_minutes=minutes,
                  directions_url=f"https://www.google.com/maps/dir/?api=1&origin={loc.latitude},{loc.longitude}"
                                 f"&destination={f.latitude},{f.longitude}&travelmode=driving")
-        meta = [ROUTING_LABELS.get(f.facility_type, ""), f"{road} km", f"{minutes} min"]
-        if f.is_24x7:
-            meta.append("24×7")
-        d["display_meta"] = " · ".join(m for m in meta if m)
+        d["display_meta"] = _meta(d, f)
     return d
+
+
+ROAD_TOP = 8  # real road distance and time for the nearest few (one routing call)
+
+
+def _meta(d: dict, f: Facility) -> str:
+    meta = [ROUTING_LABELS.get(f.facility_type, ""), f"{d['distance_km']} km", f"{d['travel_minutes']} min"]
+    if f.is_24x7:
+        meta.append("24×7")
+    return " · ".join(m for m in meta if m)
 
 
 def nearby_facilities(db: Session, loc: Location, *, types: list[str] | None = None, radius_km: float = 50,
                       limit: int = 10, emergency_only: bool = False) -> list[dict]:
+    if radius_km <= 100:
+        azure_maps.load_area(db, loc.latitude, loc.longitude)  # once per area per week, when a key is set
     rows = _nearby_rows(db, loc, types, radius_km, emergency_only)
     if len(rows) < min(limit, 3) and radius_km <= 100 and osm.load_area(db, loc.latitude, loc.longitude):
         rows = _nearby_rows(db, loc, types, radius_km, emergency_only)  # real facilities downloaded for this area
-    return [facility_dict(f, loc) for _, f in rows[:limit]]
+    out = [facility_dict(f, loc) for _, f in rows[:limit]]
+    road = routing.matrix((loc.latitude, loc.longitude), [(f.latitude, f.longitude) for _, f in rows[:min(limit, ROAD_TOP)]])
+    for d, (_, f), r in zip(out, rows, road):
+        if r:
+            d.update(distance_km=r["distance_km"], travel_minutes=r["minutes"], distance_source="road")
+            d["display_meta"] = _meta(d, f)
+        else:
+            d["distance_source"] = "estimate"
+    return out
 
 
 def _nearby_rows(db: Session, loc: Location, types: list[str] | None, radius_km: float,

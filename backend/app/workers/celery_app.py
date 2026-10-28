@@ -20,6 +20,9 @@ celery.conf.update(
         "hydration-morning": {"task": "app.workers.tasks.wellness_reminders", "schedule": crontab(hour=9, minute=0), "args": ("morning",)},
         "iron-midday": {"task": "app.workers.tasks.wellness_reminders", "schedule": crontab(hour=13, minute=45), "args": ("midday",)},
         "calcium-night": {"task": "app.workers.tasks.wellness_reminders", "schedule": crontab(hour=21, minute=0), "args": ("night",)},
+        "asha-morning-worklist": {"task": "app.workers.tasks.asha_alerts", "schedule": crontab(hour=7, minute=30), "args": ("morning",)},
+        "visit-tomorrow": {"task": "app.workers.tasks.asha_alerts", "schedule": crontab(hour=18, minute=30), "args": ("evening",)},
+        "quiet-mothers": {"task": "app.workers.tasks.asha_alerts", "schedule": crontab(hour=10, minute=0, day_of_week=1), "args": ("weekly",)},
         "analytics-snapshot": {"task": "app.workers.tasks.analytics_snapshot", "schedule": crontab(hour=23, minute=30)},
     },
 )

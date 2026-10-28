@@ -156,7 +156,7 @@ def chat(db: Session, p: Principal, mother: Mother | None, message: str, thread_
         msgs.append(ChatMessage("user", message))
         raw = llm.generate(msgs)
         if raw:
-            generated_by = "gemma"
+            generated_by = "ai"
     if not raw:
         raw = _fallback_answer(profile, message, hits, lang)
     reply = apply(raw, check, lang, disclaimer=not report_answer)

@@ -193,6 +193,10 @@
     css.push(P + S + '[style*="background: ' + rgb('#F8FAFC') + '"]{color:#FAF8F5!important}');
     // white elements inside teal cards (progress fills, chips) stay white
     css.push(P + '.jd-phone [style*="background: ' + rgb('#0F766E') + '"] [style*="background: ' + rgb('#F8FAFC') + '"]{background:#F8FAFC!important}');
+    // icons that keep their own colour on a white circle inside a teal card (the Plan My Day mic), in both themes
+    css.push('.jd-map-dark .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.7)}');
+    css.push('.jd-phone i.jd-ink-teal.jd-ink-teal.jd-ink-teal.jd-ink-teal{color:#0F766E!important}');
+    css.push('.jd-phone i.jd-ink-red.jd-ink-red.jd-ink-red.jd-ink-red{color:#DC2626!important}');
     css.push(P + '.jd-phone{color:#1C1917;box-shadow:0 30px 60px -30px rgba(0,0,0,.25)!important}');
     css.push(P + '.jd-phone [style*="background: rgb(17, 24, 39)"],' + P + '.jd-phone [style*="background: rgb(31, 24, 48)"]{box-shadow:inset 0 0 0 1px #ECE6DD}');
     css.push(P + '.jd-phone input,' + P + '.jd-phone textarea{color:#1C1917!important;color-scheme:light}');

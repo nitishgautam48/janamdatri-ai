@@ -3,14 +3,16 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 FRONTEND_DIR=/srv/frontend
 WORKDIR /app
 COPY backend/requirements.txt backend/requirements-ai.txt ./
-# INSTALL_AI=true (default) adds Whisper, PaddleOCR, Tesseract (with Hindi) and Coqui TTS.
-# Paddle needs libgomp1; Coqui uses CPU-only PyTorch here (smaller image; see docker-compose.gpu.yml for GPUs).
+# Default image (cloud AI): small. Tesseract (Hindi + English) is the local OCR fallback and ffmpeg converts voice
+# notes for Azure Speech. INSTALL_AI=true (docker-compose.local-ai.yml) adds the optional local models:
+# Whisper, PaddleOCR and Coqui TTS with CPU-only PyTorch.
 # Separate steps so an interrupted build resumes from the last finished step instead of starting over.
-ARG INSTALL_AI=true
+ARG INSTALL_AI=false
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng tesseract-ocr-hin ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 RUN pip install -r requirements.txt
 RUN if [ "$INSTALL_AI" = "true" ]; then \
-      apt-get update && apt-get install -y --no-install-recommends libgomp1 espeak-ng tesseract-ocr tesseract-ocr-eng tesseract-ocr-hin \
-      && rm -rf /var/lib/apt/lists/*; \
+      apt-get update && apt-get install -y --no-install-recommends libgomp1 espeak-ng && rm -rf /var/lib/apt/lists/*; \
     fi
 RUN if [ "$INSTALL_AI" = "true" ]; then pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu; fi
 RUN if [ "$INSTALL_AI" = "true" ]; then \

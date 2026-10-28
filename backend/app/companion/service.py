@@ -163,7 +163,7 @@ def build_plan(db: Session, mother: Mother, day: date) -> dict:
                 tip_hi = scrub(text)
             else:
                 tip = scrub(text)
-            generated_by = "rules+gemma"
+            generated_by = "rules+ai"
     return {"pregnancy_week": week, "tasks": tasks, "meals": meals, "medications": medications,
             "hydration_goal": hydration_goal, "anc_preparation": anc, "weekly_insights": insights,
             "tip": tip, "tip_hi": tip_hi, "generated_by": generated_by}

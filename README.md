@@ -24,7 +24,10 @@ janamdatri-ai/
 │   ├── janamdatri-i18n.js Hindi wording for strings that are English-only in the design
 │   ├── support.js, image-slot.js, illustrations/   from the design package
 │   └── vendor/           React 18 and the Lucide icon font, bundled (no CDN needed)
-├── backend/    FastAPI · SQLAlchemy · Alembic · Gemma · Whisper · PaddleOCR · FAISS (see backend/README.md)
+├── backend/    FastAPI · SQLAlchemy · Alembic · Gemini / Groq / Azure Speech (+ optional local models) · FAISS
+├── share.bat / share.sh   public HTTPS link through a free Cloudflare Tunnel (stop-share.bat to stop)
+├── docs/       SHARE_LINK.md (Cloudflare link) · DEPLOY_AZURE.md (optional cloud server)
+├── deploy/     share.ps1, Caddyfile, vm-setup.sh, update.sh
 └── .env.example            local settings (copied to .env on first run)
 ```
 
@@ -79,30 +82,52 @@ Login and Sign Up always start with **Who are you?** (role selection): choose *I
 - **Guest:** *Continue as Guest* gives the pregnancy guide, health questions, nearby care and SOS.
 - **Admin API:** `admin@janamdatri.local` / `ChangeMe!2026`, via `POST /api/v1/auth/admin/login` (change it in `.env`).
 
-### Turning on the AI models (optional)
+### Turning on the AI (free cloud keys)
 
-Everything works without them. When they are available they are used automatically:
+Everything works without keys: answers then come from the built-in 230-topic knowledge base. Add free keys to `.env`
+for AI answers, voice and report reading. Each one is optional; the app skips a missing or rate-limited provider and
+uses the next.
 
-| Feature | Uses | Without it | How to turn it on |
+| Feature | Provider (in order) | Key in `.env` | Where to get it |
 |---|---|---|---|
-| Health Assistant, Talk To Me, report explanations, daily tip | **Gemma 3 Instruct** | Answers from the built-in, curated knowledge base | Install [Ollama](https://ollama.com), then `ollama pull gemma3:12b` (or `gemma3:4b` on a laptop without a GPU, and set `LLM_MODEL=gemma3:4b` in `.env`) |
-| Voice input (mic buttons) | **Whisper Large V3** | Voice is off; typing works | `WITH_AI=1 ./run_local.sh` (Windows: `run_local.bat --with-ai`). Downloads the models once. |
-| Reading report **photos** | **PaddleOCR** | PDFs with text are still read | Same as above |
+| Health Assistant, Talk To Me, report explanations, daily tip | **Gemini** → **Groq** → OpenRouter → local Ollama → knowledge base | `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY` | [aistudio.google.com](https://aistudio.google.com), [console.groq.com](https://console.groq.com), [openrouter.ai/keys](https://openrouter.ai/keys) |
+| Smarter knowledge search | Gemini embeddings + keyword search | `GEMINI_API_KEY` | same |
+| Voice input (mic buttons) | **Groq Whisper** → Azure Speech → local Whisper | `GROQ_API_KEY`, `AZURE_SPEECH_KEY` | Azure portal → Speech → Free F0 |
+| Read aloud | **Azure neural voices** (Hindi / English) → phone or browser voice | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | same |
+| Reading report **photos** | **Gemini vision** → OCR.space → Tesseract | `GEMINI_API_KEY`, `OCRSPACE_API_KEY` | [ocr.space/ocrapi](https://ocr.space/ocrapi) |
+| Map pictures (served and cached by our server) | **MapTiler** → OpenStreetMap → OSM France → Esri | `MAPTILER_KEY` (optional, free) | cloud.maptiler.com → API keys |
+| Road distances and the route line | **openrouteservice** → OSRM → straight-line estimate | `ORS_API_KEY` (optional, free) | openrouteservice.org → Dashboard |
+| Extra hospitals and routes (optional) | Azure Maps | `AZURE_MAPS_KEY` | Azure portal → Azure Maps account |
 
-`http://localhost:8000/health` shows what is active.
+**Privacy:** before any text leaves the server, names, phone numbers, pincodes and IDs are removed (`AI_REDACT=true`)
+and her first name is put back into the reply. Set `OCR_CLOUD_ENABLED=false` to keep report photos on the server.
+Free tiers of some providers may use requests to improve their models: for real patients, use paid tiers or local models.
 
-### Other options
+**Free limits:** `AI_DAILY_LIMIT`, `STT_DAILY_LIMIT`, `AZURE_STT_MONTHLY_SECONDS` and `AZURE_TTS_MONTHLY_CHARS` keep usage
+inside the free tiers; after a limit the next fallback is used. `http://localhost:8000/health` shows every provider
+and today's usage.
 
-- **PostgreSQL / Redis:** set `DATABASE_URL` / `REDIS_URL` in `.env`.
-- **Mailpit already installed** (Homebrew, Scoop, Docker)? It's used as is if it's on your PATH or already listening on port 1025.
-- **Docker:** `docker compose up -d --build` runs the same app with PostgreSQL, Redis, Celery workers, Ollama and Mailpit.
-- **Use from a phone on the same Wi-Fi:** start with `uvicorn app.main:app --host 0.0.0.0` (from `backend/` with the venv active) and open `http://<your-computer's-IP>:8000`. GPS and microphone need HTTPS or localhost in most browsers.
+**Safety:** the care-level engine (WHO / MoHFW rules + the gradient-boosting model) and SOS escalation never call an
+AI provider.
+
+**Offline mode (optional):** `docker compose -f docker-compose.yml -f docker-compose.local-ai.yml up -d --build` adds
+local models (Ollama, Whisper, PaddleOCR, Coqui TTS; needs ~16 GB RAM) as the backup, or run
+`run_local.sh` with `WITH_AI=1` (`run_local.bat --with-ai`).
+
+### Share a public link (free)
+
+Double-click **`share.bat`** (or `./share.sh`): the app gets a public **https://…trycloudflare.com** link through a
+free Cloudflare Tunnel, for live demos, the jury or your phone (GPS and microphone work over HTTPS). The SMS inbox
+stays private on your computer. Details: [docs/SHARE_LINK.md](docs/SHARE_LINK.md).
+
+For an always-on server instead, see [docs/DEPLOY_AZURE.md](docs/DEPLOY_AZURE.md) (any Ubuntu VM with Docker and
+free HTTPS via `docker-compose.prod.yml`).
 
 ### Check that everything works
 
 ```bash
 cd backend && . .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install pytest && pytest             # 49 tests: engine, OCR, safety, Mailpit delivery, every API flow
+pip install pytest && pytest             # 115 tests: engine, OCR, safety, cloud providers (faked), speech accuracy, maps, Plan My Day chat, guide scope, priority engine, every API flow
 python -m scripts.smoke_test http://localhost:8000   # full journey with the server running; reads OTPs from Mailpit
 ```
 
@@ -118,13 +143,25 @@ python -m scripts.smoke_test http://localhost:8000   # full journey with the ser
 2. Fill the Health Passport. Week and EDD are calculated, and an ASHA worker is assigned automatically by village, sub-centre, pincode and distance.
 3. Use the daily screens:
    - **Home:** week, baby size, next ANC, today's wellness goals.
-   - **Companion:** Plan My Day, hydration, medicines from her reports.
+   - **Companion → Plan My Day:** a conversation (type or tap the mic). The companion asks when she wakes and sleeps, her work,
+     food, anything special today and how she feels, then builds the day around her answers (meals, tablets, walk, rest).
+     She changes it by saying "move walk to 7 pm", "add temple at 6", "remove kegel", or by tapping an item (✏️) or **+ Add**.
+     Next day she can say "same as usual". Hydration and medicines from her reports are on the same screen.
    - **Health Assistant:** text, voice and report upload, with danger-sign safety.
    - **Talk To Me:** private emotional companion.
    - **Health check:** gives one of four care levels with what was noticed and the right facility; the result can be shared with her ASHA as a referral.
    - **My ASHA:** chat, photos, location, voice notes, and a masked-call code.
-   - **Guide** and **Nearby care**.
+   - **Guide:** the week's milestone plus **Ask about week N**: questions by text or voice, answered for her week. It answers
+     only pregnancy, birth, newborn and mother-care questions and politely declines anything else.
+   - **Nearby care (map):** the **Nearby Care** card on Home (also ☰ menu → Nearby Care, SOS → To Hospital, or a result's
+     *Directions*). Allow location or type a pincode; tap a hospital for the road route.
    - **SOS:** works without login. It alerts her ASHA with her GPS location, finds the nearest 24×7 hospital, and escalates to the backup ASHA, then the ANM, then the facility if no one responds.
+
+**ASHA:** *My area* (share location once: mothers nearby without an ASHA are connected to her) and a map of her mothers coloured by care level, with the road route, Directions and Visit for each.
+*Today's work list*: every mother who needs her today, with the reasons (SOS, danger sign told to the app, care level, follow-up, newborn visit day, due date, ANC due, new report, unread message, missed iron tablets, birth preparedness), ordered urgent first and then by the shortest way, with km and time per stop; Remind (app + SMS), Done, Go, and the numbered route on the map.
+
+*Priority engine*: every mother gets a 0–100 score with the reasons, shown as a badge (Critical / High / Medium / Routine) and a "Why first" line on the work list and My Mothers. Emergencies set the score: open SOS 100, a danger sign or self-harm thought told to the app in the last 3 days 95, an Immediate Care result not yet followed up 90. Otherwise points add up from findings (Hb below 7 / 9 / 11, BP 160/110 or 140/90, high sugar), stage (past the due date, first week after birth), risk history (age under 18 or over 35, twins, previous C-section or complications, known conditions) and follow-up gaps, capped at 89. Critical mothers come first by score, the rest by band and then by the shortest way. Rules only, no AI, so every point can be explained.
+*Voice visit notes*: she speaks or types ("BP 130 by 85, Hb 9.5, pair mein sujan, bleeding nahi, IFA 30 di, agli visit 3 din baad") and BP, weight, Hb, symptoms, checklist and the next visit are filled in for her to check; the recording is kept as the visit's voice note. *Monthly report* for the ANM (visits, ANC, high-risk, referrals, deliveries, IFA) with estimated incentives (JSY, HBNC): print / PDF, CSV, or SMS summary to the ANM. *Alerts*: 7:30 AM work-list summary, "ASHA visits tomorrow" to mothers at 6:30 PM, and weekly "no news from this mother" alerts.
 
 **Mother, more screens:** *Profile* (passport strength, language, theme, read-aloud, emergency contacts, preferred facility, shared-phone PIN), *My Reports* (take a photo or upload a PDF, hemoglobin trend, extracted values, medicines), *Referral slip* for the doctor after a health check (download PDF, share link, print, Show Doctor), and *Chat history* in the Health Assistant.
 
