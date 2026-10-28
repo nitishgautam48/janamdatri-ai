@@ -1,200 +1,286 @@
+<div align="center">
+
+<img src="docs/images/banner.png" alt="Janamdatri-AI: mothers don't die because help doesn't exist, they die because it comes too late" width="100%">
+
 # Janamdatri-AI · जन्मदात्री
 
-A maternal health companion for rural and semi-urban Indian mothers. It runs entirely on your own computer and connects mothers, ASHA workers and health facilities:
+**An AI care companion for pregnant mothers in rural India, connecting them to their ASHA worker and the right facility, in time.**
 
-- Health Passport
-- AI Health Assistant
-- Pregnancy and Emotional Companions
-- Care-level assessment (never percentages)
-- Report OCR
-- GIS navigation to care
-- Secure mother–ASHA messaging
-- Referrals
-- Emergency escalation
+![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-compose-2496ED?logo=docker&logoColor=white)
+![Tests](https://img.shields.io/badge/tests-115%20passing-2ea44f)
+![Languages](https://img.shields.io/badge/UI-%E0%A4%B9%E0%A4%BF%E0%A4%82%E0%A4%A6%E0%A5%80%20%7C%20English-F97316)
+![Runs locally](https://img.shields.io/badge/runs-100%25%20locally-0F766E)
 
-```
-janamdatri-ai/
-├── run_local.sh / run_local.bat   one command to set up and start everything (app + Mailpit SMS inbox)
-├── frontend/   your design files, wired to the API
-│   ├── index.html        Landing page            (Landing Page v2.dc.html)
-│   ├── app.dc.html       Mother & ASHA web app    (Prototype.dc.html + login/passport screens from App Screens)
-│   ├── screens.dc.html   All screens, design reference (App Screens.dc.html)
-│   ├── janamdatri-api.js API client (auth, token refresh, uploads, GPS, voice recording)
-│   ├── janamdatri-ui.js  हिंदी / English switch and light / dark theme
-│   ├── janamdatri-i18n.js Hindi wording for strings that are English-only in the design
-│   ├── support.js, image-slot.js, illustrations/   from the design package
-│   └── vendor/           React 18 and the Lucide icon font, bundled (no CDN needed)
-├── backend/    FastAPI · SQLAlchemy · Alembic · Gemini / Groq / Azure Speech (+ optional local models) · FAISS
-├── share.bat / share.sh   public HTTPS link through a free Cloudflare Tunnel (stop-share.bat to stop)
-├── docs/       SHARE_LINK.md (Cloudflare link) · DEPLOY_AZURE.md (optional cloud server)
-├── deploy/     share.ps1, Caddyfile, vm-setup.sh, update.sh
-└── .env.example            local settings (copied to .env on first run)
-```
+[The problem](#-the-problem) · [What it does](#-what-it-does) · [Screens](#-screens) · [Quick start](#-quick-start) · [Demo logins](#-demo-logins) · [How it works](#-how-it-works) · [Docs](#-documentation)
 
-## Run it locally
+</div>
 
-You need **Python 3.11, 3.12 or 3.13** and an internet connection on the first run. Nothing else is required: the database is a local SQLite file, no Redis is needed, and [Mailpit](https://mailpit.axllent.org) (the local SMS inbox) is downloaded and started automatically.
+---
 
-**macOS / Linux**
+## 🩺 The problem
+
+Most pregnancy deaths in India can be prevented. The real problem is the **time lost** between the first warning sign and the right care.
+
+| **113** | **52 %** | **4 in 10** |
+|:---:|:---:|:---:|
+| mothers die per 1,00,000 live births in Rajasthan<br><sub>SRS 2018–20 (India: 97)</sub> | of pregnant women in India are anaemic<br><sub>NFHS-5, 2019–21</sub> | mothers miss the recommended 4+ ANC check-ups<br><sub>NFHS-5</sub> |
+
+The time is lost in a chain of four delays:
+
+1. **Not recognised.** She can't tell a danger sign from a normal symptom, or keeps it to herself.
+2. **Found late.** Check-ups are missed, so anaemia and high BP go unnoticed between visits.
+3. **Not followed up.** One ASHA cares for many families on paper registers. She can't see who needs her most today.
+4. **Wrong place, too slow.** In an emergency the family loses time deciding which hospital can actually help.
+
+## ✨ What it does
+
+Janamdatri-AI attacks each delay, in Hindi or English, on any phone browser:
+
+| Delay | What Janamdatri-AI does |
+|---|---|
+| Not recognised | **Health Assistant** and **health check** spot danger signs in Hindi, English and Hinglish, by text or voice. The answer is one of four care levels, never a percentage. |
+| Found late | **Health Passport** with week and due date, ANC reminders, report reading (photo or PDF), haemoglobin trend, and a **Plan My Day** companion for food, iron tablets, water, walk and rest. |
+| Not followed up | The ASHA gets a **priority work list**: every mother scored 0–100 with the reasons, critical first, then the shortest route. Also voice visit notes, alerts and a monthly report for the ANM. |
+| Wrong place, too slow | **SOS without login** sends her GPS to her ASHA, finds the nearest 24×7 facility that can handle it, and escalates to the backup ASHA, the ANM and the facility if nobody answers. |
+
+> [!IMPORTANT]
+> Janamdatri-AI **supports, and never replaces**, doctors, ANMs and ASHA workers. Emergencies, care levels and priorities come from **explainable clinical rules**, never from an AI model.
+
+## 📱 Screens
+
+<img src="docs/images/mother-app.png" alt="Mother app: home, Plan My Day, Health Assistant, Pregnancy Guide, Hindi light theme" width="100%">
+
+<img src="docs/images/care-and-sos.png" alt="Health Passport, health check result, SOS and chat with the ASHA worker" width="100%">
+
+<img src="docs/images/asha-app.png" alt="ASHA dashboard, priority work list and My Mothers" width="100%">
+
+<details>
+<summary><b>Full feature list</b></summary>
+
+**Mother**
+- **Health Passport** in 5 steps (about you, pregnancy, medical history, reports, emergency contacts). Week and due date are calculated, and an ASHA worker is assigned automatically by village, sub-centre, pincode and distance.
+- **Home:** week, baby's growth, next ANC check-up and today's wellness plan.
+- **Plan My Day:** a conversation, typed or spoken. She describes her day and the companion builds it around her routine. She can change it in words ("move walk to 7 pm").
+- **Health Assistant:** questions by text, voice or report upload, with danger-sign safety and grounded answers from a 230-topic knowledge base.
+- **Pregnancy Guide:** this week's milestone, plus "Ask about week N", which answers pregnancy, birth and newborn questions only.
+- **Health check:** one of four care levels (Routine Monitoring, Needs Attention, Medical Review Recommended, Immediate Care Recommended), what was noticed, the right facility and a referral slip.
+- **Talk To Me:** a private emotional companion.
+- **My ASHA:** chat, voice notes, photos, location and a number-masked call.
+- **Nearby care map** with road routes, and **SOS**.
+- A shared-phone PIN for family phones, Hindi or English, and dark or light theme.
+
+**ASHA worker**
+- **Dashboard:** live emergencies, counts and alerts.
+- **My area by GPS:** nearby mothers without an ASHA are connected to her, shown on a map coloured by care level.
+- **Priority work list:** the 0–100 score and reasons, with Remind (app + SMS), Done, Go and a numbered route on the map.
+- **My Mothers:** search, filters and priority badges. **Register a mother** and fill her passport on her behalf.
+- **Voice visit notes:** "BP 130 by 85, Hb 9.5, pair mein sujan…" fills BP, Hb, symptoms, checklist and the next visit for her to check.
+- **Referrals** to a PHC, CHC or district hospital.
+- **Monthly report** for the ANM: CSV, print, or an SMS summary, with estimated JSY and HBNC incentives.
+- **Automatic alerts:** the work list at 7:30 AM, "ASHA visits tomorrow" to mothers at 6:30 PM, and a weekly "no news from this mother" alert.
+
+</details>
+
+## 🚦 The priority engine
+
+Every mother gets a score from 0 to 100 that says how urgently she needs her ASHA. It runs on **rules only, no AI**, so every point is shown to the ASHA ("Why first: +95 Danger sign: convulsions") and can be audited.
+
+| Trigger (sets the score) | Score |
+|---|:---:|
+| SOS is open | **100** |
+| A danger sign or self-harm thought told to the app in the last 3 days, not visited since | **95** |
+| Immediate Care health-check result, not yet followed up | **90** |
+
+Without a trigger, points add up and stop at **89**, so a mother with many small problems never outranks an emergency:
+
+| Points from | Examples |
+|---|---|
+| Findings (last 60 days) | Hb < 7 **+35**, < 9 +22, < 11 +10 · BP ≥ 160/110 **+40**, ≥ 140/90 +25 · high sugar +12 |
+| Care level not followed up | Medical Review +45 · Needs Attention +20 · a danger sign needing a check today +35 |
+| Stage and history | past the due date +20 · first week after birth +15 · twins +12 · age < 18 or > 35 +10 · previous C-section or complications · known conditions |
+| Follow-up gaps | newborn visit day, late follow-up, ANC overdue, new flagged report, unread message, missed iron tablets, not seen for a month |
+
+**Bands:** 🔴 Critical ≥ 90 · 🟠 High 60–89 · 🟡 Medium 30–59 · ⚪ Routine < 30. Critical mothers are listed first by score; the rest by band, then by the shortest route. Thresholds follow WHO and MoHFW guidance. The rules are in [`backend/app/asha/priority.py`](backend/app/asha/priority.py).
+
+## 🚀 Quick start
+
+<details open>
+<summary><b>Option A · Docker (recommended)</b></summary>
+
+Needs [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 ```bash
-cd janamdatri-ai
-./run_local.sh
+git clone <this-repo-url> && cd janamdatri-ai
+cp .env.example .env            # Windows PowerShell: Copy-Item .env.example .env
+docker compose up -d --build
 ```
 
-**Windows**
+This starts the web app and API, PostgreSQL, Redis, a Celery worker and scheduler, and Mailpit (the local SMS inbox).
 
-```bat
-cd janamdatri-ai
-run_local.bat
+</details>
+
+<details>
+<summary><b>Option B · One script, no Docker</b></summary>
+
+Needs **Python 3.11–3.13**. It uses SQLite and needs no Redis; Mailpit is downloaded automatically.
+
+```bash
+./run_local.sh          # Windows: run_local.bat
 ```
+
+</details>
 
 Then open:
 
-- **http://localhost:8000**: landing page (the app is at `/app.dc.html`, the API reference at `/docs`)
-- **http://localhost:8025**: the **SMS inbox** (Mailpit), where OTPs and alerts arrive
+| | URL |
+|---|---|
+| 🌐 Landing page | http://localhost:8000 |
+| 📱 The app (mother and ASHA) | http://localhost:8000/app.dc.html |
+| 💬 SMS inbox: OTPs and alerts arrive here | http://localhost:8025 |
+| 📚 API reference (Swagger) | http://localhost:8000/docs |
+| ❤️ Health and provider status | http://localhost:8000/health |
 
-The first run creates a virtual environment, installs the packages, creates the database (`backend/janamdatri.db`) and loads the starter data. Later runs start in a few seconds. Stop with Ctrl+C.
+> [!NOTE]
+> **No real SMS is ever sent.** Every text (OTPs, ASHA and family alerts, referral notices) lands in the local Mailpit inbox. To use a real gateway later, change one function: `send_sms` in [`backend/app/notifications/sms.py`](backend/app/notifications/sms.py).
 
-### Signing in: OTPs arrive in Mailpit
+To update after pulling new code: `docker compose up -d --build`, then hard-refresh the browser (Ctrl+F5). Your data stays in the Docker volumes.
 
-No SMS gateway is used. Every text message the system sends lands in the local Mailpit inbox at **http://localhost:8025**, addressed to the phone number (e.g. `919876544210@sms.janamdatri.local`):
+## 🔑 Demo logins
 
-- sign-in OTPs for mothers and ASHA workers
-- emergency alerts to ASHA workers and family contacts
-- referral notices to facilities
+Login and Sign Up both start with **Who are you?**: choose *I Am A Mother* or *I Am An ASHA Worker*.
 
-After *Send OTP*, tap **Open SMS inbox (Mailpit)** in the app, read the 6-digit code and type it in. Nothing leaves your computer.
+**Mother:** Sign Up → any 10-digit mobile number starting with 6–9 → **Send OTP** → read the code in Mailpit (http://localhost:8025) → fill the Health Passport. Use village **Rampur** and pincode **243001** to be matched with the starter ASHA workers and facilities.
 
-Login and Sign Up always start with **Who are you?** (role selection): choose *I Am A Mother* or *I Am An ASHA Worker*, then Login or Sign Up.
+**ASHA worker** (starter registry, Bareilly):
 
-- **Mother (new):** Sign Up → *I Am A Mother* → any 10-digit mobile number starting with 6–9 → Send OTP → read the OTP in Mailpit → Verify → create the **Health Passport in 5 steps**:
-  1. About You
-  2. Pregnancy (LMP → week and due date)
-  3. Medical History
-  4. Upload Reports (photo or PDF, read automatically)
-  5. Emergency Contacts & preferred facility
-
-  Use village **Rampur** and pincode **243001** to be matched with the starter ASHA workers and facilities. Steps 3–5 can be skipped and finished later from *Profile*.
-- **Mother (returning):** Login → *I Am A Mother* → mobile number → OTP. On a shared family phone, set a 4-digit PIN in *Profile → Shared phone mode*, then choose *Login with your 4-digit PIN*.
-- **ASHA worker:** Login → *I Am An ASHA Worker* → `UP-BRL-04417`, `SC-2208`, `SEC-07` (Sunita Devi, Rampur Sub Centre) → Verify ID → OTP from Mailpit (sent to `919800044421`) → Continue. Others in the starter registry: `UP-BRL-04418` (Kamla Yadav, `SC-2208`/`SEC-07`), `UP-BRL-04502` (Geeta Kumari, `SC-2215`/`SEC-08`). A new, well-formed ID (e.g. `UP-BRL-05001`, `SC-2208`, `SEC-07`) is registered after adding name and mobile.
-- A mother's number entered on the ASHA screen, or an ASHA worker's number on the mother screen, is redirected to the right login.
-- **Guest:** *Continue as Guest* gives the pregnancy guide, health questions, nearby care and SOS.
-- **Admin API:** `admin@janamdatri.local` / `ChangeMe!2026`, via `POST /api/v1/auth/admin/login` (change it in `.env`).
-
-### Turning on the AI (free cloud keys)
-
-Everything works without keys: answers then come from the built-in 230-topic knowledge base. Add free keys to `.env`
-for AI answers, voice and report reading. Each one is optional; the app skips a missing or rate-limited provider and
-uses the next.
-
-| Feature | Provider (in order) | Key in `.env` | Where to get it |
+| Name | Registration No. | Sub Centre | Sector |
 |---|---|---|---|
-| Health Assistant, Talk To Me, report explanations, daily tip | **Gemini** → **Groq** → OpenRouter → local Ollama → knowledge base | `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY` | [aistudio.google.com](https://aistudio.google.com), [console.groq.com](https://console.groq.com), [openrouter.ai/keys](https://openrouter.ai/keys) |
-| Smarter knowledge search | Gemini embeddings + keyword search | `GEMINI_API_KEY` | same |
-| Voice input (mic buttons) | **Groq Whisper** → Azure Speech → local Whisper | `GROQ_API_KEY`, `AZURE_SPEECH_KEY` | Azure portal → Speech → Free F0 |
-| Read aloud | **Azure neural voices** (Hindi / English) → phone or browser voice | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | same |
-| Reading report **photos** | **Gemini vision** → OCR.space → Tesseract | `GEMINI_API_KEY`, `OCRSPACE_API_KEY` | [ocr.space/ocrapi](https://ocr.space/ocrapi) |
-| Map pictures (served and cached by our server) | **MapTiler** → OpenStreetMap → OSM France → Esri | `MAPTILER_KEY` (optional, free) | cloud.maptiler.com → API keys |
-| Road distances and the route line | **openrouteservice** → OSRM → straight-line estimate | `ORS_API_KEY` (optional, free) | openrouteservice.org → Dashboard |
-| Extra hospitals and routes (optional) | Azure Maps | `AZURE_MAPS_KEY` | Azure portal → Azure Maps account |
+| Sunita Devi (Rampur) | `UP-BRL-04417` | `SC-2208` | `SEC-07` |
+| Kamla Yadav (Mohanpur) | `UP-BRL-04418` | `SC-2208` | `SEC-07` |
+| Geeta Kumari (Bhojipura) | `UP-BRL-04502` | `SC-2215` | `SEC-08` |
+| Rekha Singh (Vigyan Nagar) | `UP-BRL-04610` | `SC-2230` | `SEC-09` |
 
-**Privacy:** before any text leaves the server, names, phone numbers, pincodes and IDs are removed (`AI_REDACT=true`)
-and her first name is put back into the reply. Set `OCR_CLOUD_ENABLED=false` to keep report photos on the server.
-Free tiers of some providers may use requests to improve their models: for real patients, use paid tiers or local models.
+Any well-formed new ID (for example `RJ-KOT-04417`, `SC-3241`, `SEC-24`) can sign up with a name and mobile number. She shows as unverified. On her dashboard, **My area → Update** connects the nearby mothers who don't have an ASHA yet.
 
-**Free limits:** `AI_DAILY_LIMIT`, `STT_DAILY_LIMIT`, `AZURE_STT_MONTHLY_SECONDS` and `AZURE_TTS_MONTHLY_CHARS` keep usage
-inside the free tiers; after a limit the next fallback is used. `http://localhost:8000/health` shows every provider
-and today's usage.
+**Guest:** *Continue as Guest* gives the guide, health questions, nearby care and SOS. **Admin API:** `admin@janamdatri.local` / `ChangeMe!2026`; change it in `.env`.
 
-**Safety:** the care-level engine (WHO / MoHFW rules + the gradient-boosting model) and SOS escalation never call an
-AI provider.
+## 🧠 How it works
 
-**Offline mode (optional):** `docker compose -f docker-compose.yml -f docker-compose.local-ai.yml up -d --build` adds
-local models (Ollama, Whisper, PaddleOCR, Coqui TTS; needs ~16 GB RAM) as the backup, or run
-`run_local.sh` with `WITH_AI=1` (`run_local.bat --with-ai`).
-
-### Share a public link (free)
-
-Double-click **`share.bat`** (or `./share.sh`): the app gets a public **https://…trycloudflare.com** link through a
-free Cloudflare Tunnel, for live demos, the jury or your phone (GPS and microphone work over HTTPS). The SMS inbox
-stays private on your computer. Details: [docs/SHARE_LINK.md](docs/SHARE_LINK.md).
-
-For an always-on server instead, see [docs/DEPLOY_AZURE.md](docs/DEPLOY_AZURE.md) (any Ubuntu VM with Docker and
-free HTTPS via `docker-compose.prod.yml`).
-
-### Check that everything works
-
-```bash
-cd backend && . .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install pytest && pytest             # 115 tests: engine, OCR, safety, cloud providers (faked), speech accuracy, maps, Plan My Day chat, guide scope, priority engine, every API flow
-python -m scripts.smoke_test http://localhost:8000   # full journey with the server running; reads OTPs from Mailpit
+```mermaid
+flowchart LR
+    subgraph Users["📱 Any phone browser"]
+        M["Mother app<br/>हिंदी · English"]
+        A["ASHA app"]
+    end
+    M & A -->|"HTTPS · JWT"| API["FastAPI<br/>125 endpoints"]
+    API --> RULES["🛡️ Rules, never AI<br/>danger signs · care levels<br/>priority engine · SOS escalation"]
+    API -->|"names, phones, IDs removed"| LLM["🤖 Language models<br/>Gemini → Groq → OpenRouter<br/>→ Ollama → knowledge base"]
+    API --> STT["🎙️ Speech<br/>Groq Whisper → Azure → local"]
+    API --> GIS["🗺️ Maps and routes<br/>tile proxy · openrouteservice → OSRM"]
+    API --> DB[("PostgreSQL / SQLite")]
+    API --> Q["⏱️ Celery worker + beat<br/>escalation · reminders · ASHA alerts"]
+    Q --> SMS["💬 SMS → Mailpit inbox"]
+    API --> SMS
 ```
 
+**What happens when a mother reports a danger sign:**
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Mother
+    participant App as Janamdatri-AI
+    participant Rules as Safety rules
+    actor ASHA
+    Mother->>App: "Mujhe subah se jhatke aa rahe hain" (voice or text)
+    App->>Rules: check message for danger signs
+    Rules-->>App: convulsions → Immediate Care
+    App-->>Mother: reply starts with 108 / SOS guidance
+    App->>ASHA: alert: danger sign reported
+    App->>ASHA: work list: Critical · 95 · "Why first: danger sign: convulsions"
+    ASHA->>Mother: calls or visits first
+```
+
+**Works without any keys.** Answers then come from the built-in 230-topic knowledge base, and maps use OpenStreetMap. Each free key you add makes it smarter, and a missing or rate-limited provider is simply skipped:
+
+| Feature | Providers, in order | Key in `.env` (all optional) |
+|---|---|---|
+| Health Assistant, Talk To Me, reports, tips | Gemini → Groq → OpenRouter → local Ollama → knowledge base | `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY` |
+| Voice input | Groq Whisper `large-v3` → Azure Speech → local Whisper | `GROQ_API_KEY`, `AZURE_SPEECH_KEY` |
+| Read aloud | Azure neural voices (Hindi, English) → phone voice | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` |
+| Report photos | Gemini vision → OCR.space → Tesseract | `GEMINI_API_KEY`, `OCRSPACE_API_KEY` |
+| Map tiles (served and cached by the server) | MapTiler → OpenStreetMap → OSM France → Esri | `MAPTILER_KEY` |
+| Road routes and distances | openrouteservice → OSRM → straight-line estimate | `ORS_API_KEY` |
+
+Free keys: [Google AI Studio](https://aistudio.google.com) · [Groq](https://console.groq.com) · [OpenRouter](https://openrouter.ai/keys) · [MapTiler](https://cloud.maptiler.com) · [openrouteservice](https://openrouteservice.org) · [OCR.space](https://ocr.space/ocrapi). Daily caps (`AI_DAILY_LIMIT`, `STT_DAILY_LIMIT`, …) keep usage inside the free tiers.
+
+## 🔒 Privacy and safety
+
+- **No percentages.** Results are care levels. The safety layer removes any sentence that states a probability, and tests check that none appear.
+- **AI never decides an emergency.** The risk model can raise a care level by at most one step, never above Medical Review. Only clinical danger rules give "Immediate Care".
+- **Redaction:** names, phone numbers, pincodes and IDs are removed before any text reaches a cloud model.
+- **Private by design:**
+  - *Talk To Me* is readable only by the mother.
+  - Phone numbers are never shown between mother and ASHA.
+  - ASHA workers see only their own mothers, and that access is audited.
+- **Hardening:** hashed OTPs with expiry and rate limits, rotating refresh tokens, upload type checks. In production the app refuses to start with default secrets.
+
+Details: [backend/README.md](backend/README.md#safety-and-privacy-guarantees-enforced-in-code-and-tests).
+
+## 🧪 Tests
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+pytest                                              # 115 tests
+python -m scripts.smoke_test http://localhost:8000  # full journey against a running server
+```
+
+The tests cover the clinical engine, safety, OCR, cloud providers (faked), speech accuracy, maps and routes, Plan My Day, the guide's topic guard, the priority engine and every API flow.
+
+## 🗂️ Project structure
+
+```
+janamdatri-ai/
+├── frontend/                 the web app (mother + ASHA), landing page, Hindi wording, themes
+├── backend/
+│   ├── app/                  FastAPI: auth, passport, assistant, companion, assessment, reports,
+│   │                         asha (worklist, priority, area, report), emergency, messaging, gis …
+│   ├── alembic/              database migrations
+│   ├── scripts/              smoke test, risk-model training, model download
+│   └── tests/                115 tests
+├── docs/                     user guide, public link, cloud deployment, README images
+├── deploy/                   Caddy, VM setup and update scripts
+├── docker-compose*.yml       local stack · offline AI · production · Cloudflare tunnel
+├── run_local.sh / .bat       run without Docker
+├── share.sh / .bat           public HTTPS link through a free Cloudflare Tunnel
+└── .env.example              every setting, with comments
+```
+
+**Stack:** FastAPI · SQLAlchemy 2 · Alembic · PostgreSQL / SQLite · Redis · Celery · Pydantic v2 · JWT · scikit-learn · FAISS · Leaflet · React 18 (bundled, no CDN) · Docker
+
+## 📚 Documentation
+
+| Guide | |
+|---|---|
+| [User guide](docs/USER_GUIDE.md) | every screen for mothers and ASHA workers, step by step |
+| [Backend](backend/README.md) | architecture, AI providers, safety guarantees, all API endpoints |
+| [Share a public link](docs/SHARE_LINK.md) | `share.bat` / `./share.sh` gives a free https link for demos (GPS and mic work over HTTPS) |
+| [Deploy on a server](docs/DEPLOY_AZURE.md) | always-on Ubuntu VM with Docker and free HTTPS |
+
+## 🛣️ Before real-world use
+
+- Have the clinical thresholds ([`assessment/engine.py`](backend/app/assessment/engine.py), [`asha/priority.py`](backend/app/asha/priority.py)), the health content ([`knowledge/`](backend/app/knowledge)) and the AI prompts ([`ai/prompts.py`](backend/app/ai/prompts.py)) reviewed by a medical team.
+- Replace the Bareilly starter data ([`database/seed.py`](backend/app/database/seed.py)) with your district's facilities, villages and ASHA registry.
+- Connect a real SMS gateway (`send_sms`), and use paid or local AI models for real patient data.
+- Add more Indian languages.
+
 ---
 
-## Using the app
+<div align="center">
 
-**Language and theme:** the हिंदी / English switch and the light / dark (☀/☾) button are on the first screen and in *Profile*. The choice is remembered on the device, and the Health Assistant and Talk To Me reply in the chosen language. The landing page has the same language switch (bottom left).
+**Janamdatri-AI** · जन्मदात्री · *help that reaches mothers in time*
 
-**Mother**
-
-1. Sign up with OTP.
-2. Fill the Health Passport. Week and EDD are calculated, and an ASHA worker is assigned automatically by village, sub-centre, pincode and distance.
-3. Use the daily screens:
-   - **Home:** week, baby size, next ANC, today's wellness goals.
-   - **Companion → Plan My Day:** a conversation (type or tap the mic). The companion asks when she wakes and sleeps, her work,
-     food, anything special today and how she feels, then builds the day around her answers (meals, tablets, walk, rest).
-     She changes it by saying "move walk to 7 pm", "add temple at 6", "remove kegel", or by tapping an item (✏️) or **+ Add**.
-     Next day she can say "same as usual". Hydration and medicines from her reports are on the same screen.
-   - **Health Assistant:** text, voice and report upload, with danger-sign safety.
-   - **Talk To Me:** private emotional companion.
-   - **Health check:** gives one of four care levels with what was noticed and the right facility; the result can be shared with her ASHA as a referral.
-   - **My ASHA:** chat, photos, location, voice notes, and a masked-call code.
-   - **Guide:** the week's milestone plus **Ask about week N**: questions by text or voice, answered for her week. It answers
-     only pregnancy, birth, newborn and mother-care questions and politely declines anything else.
-   - **Nearby care (map):** the **Nearby Care** card on Home (also ☰ menu → Nearby Care, SOS → To Hospital, or a result's
-     *Directions*). Allow location or type a pincode; tap a hospital for the road route.
-   - **SOS:** works without login. It alerts her ASHA with her GPS location, finds the nearest 24×7 hospital, and escalates to the backup ASHA, then the ANM, then the facility if no one responds.
-
-**ASHA:** *My area* (share location once: mothers nearby without an ASHA are connected to her) and a map of her mothers coloured by care level, with the road route, Directions and Visit for each.
-*Today's work list*: every mother who needs her today, with the reasons (SOS, danger sign told to the app, care level, follow-up, newborn visit day, due date, ANC due, new report, unread message, missed iron tablets, birth preparedness), ordered urgent first and then by the shortest way, with km and time per stop; Remind (app + SMS), Done, Go, and the numbered route on the map.
-
-*Priority engine*: every mother gets a 0–100 score with the reasons, shown as a badge (Critical / High / Medium / Routine) and a "Why first" line on the work list and My Mothers. Emergencies set the score: open SOS 100, a danger sign or self-harm thought told to the app in the last 3 days 95, an Immediate Care result not yet followed up 90. Otherwise points add up from findings (Hb below 7 / 9 / 11, BP 160/110 or 140/90, high sugar), stage (past the due date, first week after birth), risk history (age under 18 or over 35, twins, previous C-section or complications, known conditions) and follow-up gaps, capped at 89. Critical mothers come first by score, the rest by band and then by the shortest way. Rules only, no AI, so every point can be explained.
-*Voice visit notes*: she speaks or types ("BP 130 by 85, Hb 9.5, pair mein sujan, bleeding nahi, IFA 30 di, agli visit 3 din baad") and BP, weight, Hb, symptoms, checklist and the next visit are filled in for her to check; the recording is kept as the visit's voice note. *Monthly report* for the ANM (visits, ANC, high-risk, referrals, deliveries, IFA) with estimated incentives (JSY, HBNC): print / PDF, CSV, or SMS summary to the ANM. *Alerts*: 7:30 AM work-list summary, "ASHA visits tomorrow" to mothers at 6:30 PM, and weekly "no news from this mother" alerts.
-
-**Mother, more screens:** *Profile* (passport strength, language, theme, read-aloud, emergency contacts, preferred facility, shared-phone PIN), *My Reports* (take a photo or upload a PDF, hemoglobin trend, extracted values, medicines), *Referral slip* for the doctor after a health check (download PDF, share link, print, Show Doctor), and *Chat history* in the Health Assistant.
-
-**ASHA worker:** the dashboard shows assigned mothers, today's visits, ANC due and live emergency cases. Tap *Open* to respond, and the mother sees "ASHA is responding". From the dashboard:
-- **Register Mother:** name, age, mobile, village, RCH ID → fill her 5-step passport on her behalf. She can later sign in with that number.
-- **My Mothers:** search and filter (ANC due, follow-up, high risk, visit today), then per mother:
-  - **Home Visit:** BP, weight, Hb, checklist, notes or a voice note → the care level is checked and the next visit is scheduled.
-  - **Referral:** care level → auto-matched PHC / CHC / district hospital → reason → sent to the mother, and the facility is notified.
-  - **Passport:** view or edit it.
-
-> Text messages (OTPs, alerts to ASHA workers, family and facilities) go to the Mailpit inbox; in-app notifications work as normal. Adding a real SMS gateway later means changing a single function, `send_sms` in `backend/app/notifications/sms.py`.
-
----
-
-## How the design files were wired
-
-Your HTML files from the design package are the frontend. Their layout and styles are unchanged:
-
-- Static sample values ("Priya", "Week 24", "Fri, 12 Oct · PHC Rampur", "118/76", "Sunita Devi"…) became `{{ bindings }}` filled from the API.
-- The "Type or speak…" bars became real inputs, and the buttons call the API.
-- The prototype's script was replaced with live logic that talks to the backend.
-- These screens were ported from `App Screens.dc.html`:
-  - role selection with Login / Sign Up (A1)
-  - mother login (A1b) and guest hub (A1c)
-  - ASHA login (A2)
-  - the 5-step passport and its completion card (A3–A5)
-  - Profile (B7)
-  - Chat history (B3b)
-  - My Reports (C5)
-  - Referral slip (D2)
-  - the ASHA tools Register Mother, Home Visit and Referral Generator (F1–F3)
-- The light theme uses the colours of the design's light variant (E1–E11).
-- The designer-only side panel and the fake phone status bar were removed. On phones the app is full-screen; on desktop it is shown at phone width.
-- On the landing page, Login, Sign Up, Create Health Passport, Emergency, Talk To Me, Message ASHA and Nearest hospital open the app. Call 108 dials 108.
-
-Before real-world use, have the clinical thresholds (`backend/app/assessment/engine.py`), the health content (`backend/app/knowledge/`) and the AI prompts (`backend/app/ai/prompts.py`) reviewed by a medical team. Also replace the Bareilly starter data (`backend/app/database/seed.py`) with your district's facilities, villages and ASHA registry.
+</div>

@@ -57,7 +57,7 @@ The starter reference data (`SEED_REFERENCE_DATA=true`) loads facilities around 
 | Text-to-speech | Azure neural voices (`hi-IN-SwaraNeural`, `en-IN-NeerjaNeural`) → local Coqui | Phone / browser voice |
 | Report photos | Gemini vision → OCR.space → PaddleOCR → Tesseract | Text layer of PDFs; on-device text via `client_text` |
 | Retrieval | Hybrid: keyword hashing + Gemini embeddings (or nomic-embed in Ollama) | Keyword hashing (English, Hindi, Hinglish) |
-| Road routes | Azure Maps → OSRM | Straight-line estimate |
+| Road routes | Azure Maps → openrouteservice → OSRM | Straight-line estimate |
 | Risk model | `HistGradientBoostingClassifier` on a synthetic clinical cohort (local, never cloud) | same |
 
 Cloud requests are redacted (`app/ai/redact.py`), counted against daily / monthly caps (`app/ai/usage.py`), and a
@@ -72,7 +72,7 @@ app/
 ├── passport/      5-step Maternal Health Passport, LMP→EDD, completion, emergency contacts
 ├── asha/          auto-assignment (village, sub-centre, pincode, sector, GIS), dashboard, register mother
 ├── visits/        home visit engine (BP, weight, Hb, symptoms, checklist, voice note, next visit)
-├── assistant/     Health Assistant: Gemma + FAISS retrieval + safety layer, history, "Tell my ASHA"
+├── assistant/     Health Assistant: LLM chain + FAISS retrieval + safety layer, history, "Tell my ASHA"
 ├── voice/         Whisper transcription
 ├── companion/     daily planner, Plan My Day conversation (understand.py reads her answers, dayplan.py builds and edits the plan),
 │                  meals, medication reminders from reports, hydration, ANC prep, streaks
@@ -120,7 +120,7 @@ app/
 
 ---
 
-## API (107 endpoints, all under `/api/v1`; full schema at `/docs`)
+## API (125 endpoints, all under `/api/v1`; full schema at `/docs`)
 
 | Area | Endpoints |
 |---|---|
